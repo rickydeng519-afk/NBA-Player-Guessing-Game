@@ -94,6 +94,84 @@ body {
   transform: translateY(0) scale(0.97);
 }
 
+/* ── Mode Tabs ──────────────────────────────────────────── */
+.mode-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 14px;
+}
+
+.mode-tab {
+  background: var(--card);
+  border: 2px solid var(--border);
+  color: var(--text-dim);
+  padding: 8px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-family: var(--font);
+  font-weight: 600;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
+}
+
+.mode-tab:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.mode-tab--active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.mode-tab--active:hover {
+  color: #fff;
+  transform: none;
+}
+
+/* ── 2012-13 Mode Theme (Heat Red/Gold) ──────────────────── */
+body.mode--2013 {
+  --accent: #98002E;
+  --accent-glow: rgba(152,0,46,0.12);
+}
+
+body.mode--2013 .header__title {
+  background: linear-gradient(135deg, #98002E 0%, #F9A01B 60%, #98002E 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+body.mode--2013 .search__input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-glow);
+}
+
+body.mode--2013 .search__item:hover,
+body.mode--2013 .search__item--active {
+  background: #fdf2f5;
+  color: var(--accent);
+}
+
+body.mode--2013 .header__new-game:hover {
+  background: #fdf2f5;
+}
+
+body.mode--2013 .silhouette__btn:hover {
+  background: #98002E;
+  border-color: #98002E;
+}
+
+body.mode--2013 .share__btn--play-again:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 /* ── Search ─────────────────────────────────────────────── */
 .search-wrapper {
   position: relative;

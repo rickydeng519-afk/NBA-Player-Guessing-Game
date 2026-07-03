@@ -7,6 +7,34 @@ const MAX_GUESSES = 8;
 const STORAGE_KEY = 'nbaMysteryPlayer';
 const COLUMNS = ['Team', 'Conf', 'Div', 'Pos', 'Ht', 'Age', '#'];
 
+// ── Mode ───────────────────────────────────────────────────
+let PLAYERS = PLAYERS_CURRENT;
+let currentMode = 'current'; // 'current' | '2013'
+
+function switchMode(mode) {
+  if (mode === currentMode) return;
+  currentMode = mode;
+  PLAYERS = mode === '2013' ? PLAYERS_2013 : PLAYERS_CURRENT;
+
+  // Toggle body class for theming
+  document.body.classList.toggle('mode--2013', mode === '2013');
+
+  // Update subtitle
+  const subtitle = document.querySelector('.header__subtitle');
+  if (subtitle) {
+    subtitle.textContent = mode === '2013'
+      ? '2012-13 Season · 吾皇登基'
+      : 'Guess the hidden player — endless mode';
+  }
+
+  // Toggle active button
+  document.getElementById('modeCurrent')?.classList.toggle('mode-tab--active', mode === 'current');
+  document.getElementById('mode2013')?.classList.toggle('mode-tab--active', mode === '2013');
+
+  resetGame();
+  console.log(`Switched to ${mode === '2013' ? '👑 吾皇登基 (2012-13)' : '♾️ Endless (current)'}`);
+}
+
 // ── State ──────────────────────────────────────────────────
 let mysteryPlayer = null;
 let guesses = [];
@@ -77,6 +105,7 @@ function saveState() {
     mysteryId: mysteryPlayer ? mysteryPlayer.id : null,
     guesses: guesses,
     gameOver: gameOver,
+    mode: currentMode,
   };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   localStorage.setItem(STORAGE_KEY + '_date', state.date);
@@ -89,6 +118,14 @@ function loadState() {
       const state = JSON.parse(raw);
       guesses = state.guesses || [];
       gameOver = state.gameOver || false;
+      currentMode = state.mode || 'current';
+      PLAYERS = currentMode === '2013' ? PLAYERS_2013 : PLAYERS_CURRENT;
+
+      // Restore mode UI
+      document.body.classList.toggle('mode--2013', currentMode === '2013');
+      document.getElementById('modeCurrent')?.classList.toggle('mode-tab--active', currentMode === 'current');
+      document.getElementById('mode2013')?.classList.toggle('mode-tab--active', currentMode === '2013');
+
       if (state.mysteryId !== null && state.mysteryId !== undefined) {
         mysteryPlayer = PLAYERS.find(p => p.id === state.mysteryId) || null;
       }
@@ -110,6 +147,10 @@ function bindEvents() {
   document.addEventListener('click', onDocumentClick);
   dom.silhouetteBtn.addEventListener('click', toggleSilhouette);
   document.getElementById('newGameBtn').addEventListener('click', resetGame);
+
+  // Mode tabs
+  document.getElementById('modeCurrent')?.addEventListener('click', () => switchMode('current'));
+  document.getElementById('mode2013')?.addEventListener('click', () => switchMode('2013'));
 
   // Overlay buttons
   document.getElementById('shareBtn').addEventListener('click', copyShare);
@@ -421,7 +462,8 @@ function showOverlay(won) {
 
 function generateShareGrid(won) {
   const date = new Date().toISOString().slice(0, 10);
-  let text = `🏀 NBA Mystery Player ${date} 🏀\n`;
+  const modeLabel = currentMode === '2013' ? '👑 吾皇登基 2012-13' : '🏀 NBA Mystery Player';
+  let text = `${modeLabel} ${date}\n`;
 
   guesses.forEach(g => {
     const result = compareAll(g, mysteryPlayer);

@@ -15,6 +15,9 @@ with open(os.path.join(PROJECT_DIR, 'src', 'game.js'), 'r') as f:
 with open(os.path.join(PROJECT_DIR, 'data', 'players.js'), 'r') as f:
     players_data = f.read()
 
+with open(os.path.join(PROJECT_DIR, 'data', 'players_2013.js'), 'r') as f:
+    players_2013 = f.read()
+
 # Build HTML
 html = f'''<!DOCTYPE html>
 <html lang="en">
@@ -35,6 +38,10 @@ html = f'''<!DOCTYPE html>
   <header class="header">
     <h1 class="header__title">🏀 NBA Mystery Player</h1>
     <p class="header__subtitle">Guess the hidden player — endless mode</p>
+    <div class="mode-tabs">
+      <button id="modeCurrent" class="mode-tab mode-tab--active">♾️ Endless</button>
+      <button id="mode2013" class="mode-tab">👑 吾皇登基</button>
+    </div>
     <button id="newGameBtn" class="header__new-game">🔄 New Game</button>
   </header>
 
@@ -105,9 +112,19 @@ html = f'''<!DOCTYPE html>
 
 <script>
 // ═══════════════════════════════════════════════════════════════
-// PLAYER DATA (auto-generated)
+// PLAYER DATA — Current Season (auto-generated)
 // ═══════════════════════════════════════════════════════════════
 {players_data}
+
+// ═══════════════════════════════════════════════════════════════
+// PLAYER DATA — 2012-13 Season (auto-generated)
+// ═══════════════════════════════════════════════════════════════
+{players_2013}
+
+// ═══════════════════════════════════════════════════════════════
+// Active dataset reference
+// ═══════════════════════════════════════════════════════════════
+let PLAYERS = PLAYERS_CURRENT;
 
 // ═══════════════════════════════════════════════════════════════
 // GAME LOGIC

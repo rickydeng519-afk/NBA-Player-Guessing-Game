@@ -1,7 +1,7 @@
 // Auto-generated NBA player data
 // Total players: 530
 
-const PLAYERS = [
+const PLAYERS_CURRENT = [
   {"id":0,"name":"Precious Achiuwa","team":"SAC","conf":"West","div":"Pacific","pos":["F"],"ht":"6-8","htInches":80,"age":26,"jersey":"9","formerTeams":["MIA", "NYK", "TOR"],"nbaId":1630173},
   {"id":1,"name":"Steven Adams","team":"HOU","conf":"West","div":"Southwest","pos":["C"],"ht":"6-11","htInches":83,"age":32,"jersey":"12","formerTeams":["MEM", "NOP", "OKC"],"nbaId":203500},
   {"id":2,"name":"Bam Adebayo","team":"MIA","conf":"East","div":"Southeast","pos":["C", "F"],"ht":"6-9","htInches":81,"age":28,"jersey":"13","formerTeams":[],"nbaId":1628389},
