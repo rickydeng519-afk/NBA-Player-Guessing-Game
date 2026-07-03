@@ -298,19 +298,25 @@ body.mode--2013 .share__btn--play-again:hover {
   transform: translateY(0) scale(0.97);
 }
 
-.silhouette__img {
+.silhouette__wrap {
   display: none;
-  max-width: 200px;
+  max-width: 216px;
   margin: 16px auto 0;
   border-radius: var(--radius);
   background: #fff;
   padding: 8px;
-  filter: brightness(0);
-  opacity: 0.9;
   box-shadow: var(--shadow);
 }
 
-.silhouette__img--visible { display: block; }
+.silhouette__wrap--visible { display: block; }
+
+.silhouette__img {
+  display: block;
+  width: 100%;
+  border-radius: 6px;
+  filter: brightness(0);
+  opacity: 0.9;
+}
 
 .silhouette__img--revealed {
   filter: none;
