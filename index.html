@@ -517,8 +517,7 @@ body {
     <button id="silhouetteBtn" class="silhouette__btn">👤 Reveal Silhouette</button>
     <img id="silhouetteImg" class="silhouette__img"
          src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-         alt="Player silhouette"
-         onerror="this.style.display='none'">
+         alt="Player silhouette">
   </div>
 
   <!-- Guess Table -->
@@ -1477,6 +1476,8 @@ function endGame(won) {
 function revealPlayerImage() {
   if (mysteryPlayer && mysteryPlayer.nbaId) {
     dom.silhouetteImg.src = getHeadshotUrl(mysteryPlayer.nbaId);
+    dom.silhouetteImg.onload = null;
+    dom.silhouetteImg.onerror = null;
   }
   dom.silhouetteImg.classList.add('silhouette__img--visible', 'silhouette__img--revealed');
   dom.silhouetteBtn.textContent = '🙈 Hide Silhouette';
@@ -1569,9 +1570,14 @@ function getHeadshotUrl(nbaId) {
   return `https://cdn.nba.com/headshots/nba/latest/260x190/${nbaId}.png`;
 }
 
+let silhouettePreloaded = false;
+
 function preloadSilhouette() {
+  silhouettePreloaded = false;
   if (mysteryPlayer && mysteryPlayer.nbaId) {
     const img = new Image();
+    img.onload = () => { silhouettePreloaded = true; };
+    img.onerror = () => { silhouettePreloaded = false; };
     img.src = getHeadshotUrl(mysteryPlayer.nbaId);
   }
 }
@@ -1583,10 +1589,24 @@ function toggleSilhouette() {
     dom.silhouetteBtn.textContent = '👤 Reveal Silhouette';
   } else {
     if (mysteryPlayer && mysteryPlayer.nbaId) {
-      dom.silhouetteImg.src = getHeadshotUrl(mysteryPlayer.nbaId);
+      const url = getHeadshotUrl(mysteryPlayer.nbaId);
+      dom.silhouetteImg.src = url;
+
+      // Handle load success
+      dom.silhouetteImg.onload = () => {
+        dom.silhouetteImg.style.display = '';
+        dom.silhouetteBtn.textContent = '🙈 Hide Silhouette';
+      };
+
+      // Handle load failure
+      dom.silhouetteImg.onerror = () => {
+        dom.silhouetteImg.classList.remove('silhouette__img--visible');
+        showToast('Image failed to load. Check your network or try again.');
+        dom.silhouetteBtn.textContent = '👤 Reveal Silhouette';
+      };
     }
     dom.silhouetteImg.classList.add('silhouette__img--visible');
-    dom.silhouetteBtn.textContent = '🙈 Hide Silhouette';
+    dom.silhouetteBtn.textContent = '⏳ Loading...';
   }
 }
 
