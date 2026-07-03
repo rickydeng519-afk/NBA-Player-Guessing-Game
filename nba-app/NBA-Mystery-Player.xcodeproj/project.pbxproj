@@ -1,0 +1,279 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		9F275E9BC41D4A63AC1E093E /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A13AC6659EA417487FC1633; };
+		60FCD7BA897B49D3B7DA94CE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 473140BD3BC54042A674786B; };
+		4CB67B0D97B64AB4B83819B2 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F29E4CB0BFF34A2A86BC8E65; };
+		E571E210BA3F4248B46C9450 /* game.html in Resources */ = {isa = PBXBuildFile; fileRef = 07BCB5023C3E4D76B33602DF; };
+		DD48176B8EBB4CBEAC7B7A62 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F1A9070AB43C4CC7A9147D9E; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1A13AC6659EA417487FC1633 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
+		473140BD3BC54042A674786B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		F29E4CB0BFF34A2A86BC8E65 /* WebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
+		07BCB5023C3E4D76B33602DF /* game.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = game.html; sourceTree = "<group>"; };
+		F1A9070AB43C4CC7A9147D9E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		E0AC20E583AB4B0784A3848C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3BE16C671DDD4504A1206921 /* NBA Mystery Player.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "NBA Mystery Player.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		69F4434E76DC4F9EABC86EA0 = {
+			isa = PBXGroup;
+			children = (
+				6296A96F089D43F8BAE685EE /* Sources */,
+				1C81E9FD060F4619A9F20694 /* Resources */,
+				EBEF0865B12D48D1A9679364 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		6296A96F089D43F8BAE685EE /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				1A13AC6659EA417487FC1633 /* App.swift */,
+				473140BD3BC54042A674786B /* ContentView.swift */,
+				F29E4CB0BFF34A2A86BC8E65 /* WebView.swift */,
+			);
+			path = "NBA-Mystery-Player";
+			sourceTree = "<group>";
+		};
+		1C81E9FD060F4619A9F20694 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				07BCB5023C3E4D76B33602DF /* game.html */,
+				F1A9070AB43C4CC7A9147D9E /* Assets.xcassets */,
+				E0AC20E583AB4B0784A3848C /* Info.plist */,
+			);
+			path = "NBA-Mystery-Player";
+			sourceTree = "<group>";
+		};
+		EBEF0865B12D48D1A9679364 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3BE16C671DDD4504A1206921 /* NBA Mystery Player.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		37812A77710042B186070049 /* NBA Mystery Player */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 31200F51A59B4FCF9C7BA5D1 /* Build configuration list for PBXNativeTarget */;
+			buildPhases = (
+				29D262B26BCA4DAB87BB2649 /* Sources */,
+				7A6C4EB615B043398DAFCC7E /* Frameworks */,
+				C0C88993AC4046E59FA423A3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "NBA Mystery Player";
+			productName = "NBA Mystery Player";
+			productReference = 3BE16C671DDD4504A1206921 /* NBA Mystery Player.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4A38ADA96BAF4CC9A65C7D5A /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1620;
+				LastUpgradeCheck = 1620;
+				TargetAttributes = {
+					37812A77710042B186070049 = {
+						CreatedOnToolsVersion = 16.2;
+					};
+				};
+			};
+			buildConfigurationList = B31BA9AC776640D2A80D2C4D /* Build configuration list for PBXProject */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 69F4434E76DC4F9EABC86EA0;
+			productRefGroup = EBEF0865B12D48D1A9679364 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				37812A77710042B186070049 /* NBA Mystery Player */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		29D262B26BCA4DAB87BB2649 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9F275E9BC41D4A63AC1E093E /* App.swift in Sources */,
+				60FCD7BA897B49D3B7DA94CE /* ContentView.swift in Sources */,
+				4CB67B0D97B64AB4B83819B2 /* WebView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXResourcesBuildPhase section */
+		C0C88993AC4046E59FA423A3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E571E210BA3F4248B46C9450 /* game.html in Resources */,
+				DD48176B8EBB4CBEAC7B7A62 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		7A6C4EB615B043398DAFCC7E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1B8D319D7AEA4BDEADB42EC2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGNING_ALLOWED = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = "NBA-Mystery-Player/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nba.mysteryplayer;
+				PRODUCT_NAME = "NBA Mystery Player";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		4BE7CA12C7D74C1DB87EF735 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGNING_ALLOWED = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				INFOPLIST_FILE = "NBA-Mystery-Player/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.nba.mysteryplayer;
+				PRODUCT_NAME = "NBA Mystery Player";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		9CFFA9E1327F41678C7F98BC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		70AF478D64AE4EABA32426AA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_OPTIMIZATION_LEVEL = s;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		B31BA9AC776640D2A80D2C4D /* Build configuration list for PBXProject "NBA Mystery Player" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9CFFA9E1327F41678C7F98BC /* Debug */,
+				70AF478D64AE4EABA32426AA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		31200F51A59B4FCF9C7BA5D1 /* Build configuration list for PBXNativeTarget "NBA Mystery Player" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1B8D319D7AEA4BDEADB42EC2 /* Debug */,
+				4BE7CA12C7D74C1DB87EF735 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 4A38ADA96BAF4CC9A65C7D5A /* Project object */;
+}

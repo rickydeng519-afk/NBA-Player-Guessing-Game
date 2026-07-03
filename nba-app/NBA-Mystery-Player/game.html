@@ -1,4 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>NBA Mystery Player</title>
+<meta name="description" content="Guess the hidden NBA player! A new mystery player every day.">
+<meta name="theme-color" content="#1a1a1a">
+<style>
+/* ═══════════════════════════════════════════════════════════
+   NBA MYSTERY PLAYER — Light Vibrant Styles
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  --bg: #f5f6f8;
+  --card: #ffffff;
+  --text: #1a1a2e;
+  --text-dim: #999;
+  --green: #43a047;
+  --yellow: #f5a623;
+  --black-cell: #e8ecf0;
+  --border: #e0e4e8;
+  --input-bg: #ffffff;
+  --input-focus: #e8f0fe;
+  --danger: #e74c3c;
+  --radius: 10px;
+  --font: system-ui, -apple-system, sans-serif;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+  --shadow: 0 2px 10px rgba(0,0,0,0.07);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+  --accent: #1a73e8;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.5;
+}
+
+/* ── Layout ─────────────────────────────────────────────── */
+.container {
+  width: 100%;
+  max-width: 600px;
+  padding: 0 16px;
+  margin: 0 auto;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+.header {
+  text-align: center;
+  padding: 36px 0 24px;
+}
+
+.header__title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.header__subtitle {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.header__new-game {
+  margin-top: 12px;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  color: var(--text);
+  padding: 8px 22px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-family: var(--font);
+  font-weight: 600;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
+}
+
+.header__new-game:hover {
+  background: #f0f4ff;
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.header__new-game:active {
+  transform: translateY(0) scale(0.97);
+}
+
+/* ── Search ─────────────────────────────────────────────── */
+.search-wrapper {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.search__input {
+  width: 100%;
+  padding: 14px 18px;
+  background: var(--input-bg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 1rem;
+  font-family: var(--font);
+  outline: none;
+  transition: all 0.25s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.search__input:focus {
+  border-color: var(--accent);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(26,115,232,0.1);
+}
+
+.search__input::placeholder { color: var(--text-dim); }
+
+.search__dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 320px;
+  overflow-y: auto;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  z-index: 100;
+  display: none;
+  box-shadow: var(--shadow-lg);
+}
+
+.search__dropdown--open { display: block; }
+
+.search__item {
+  padding: 12px 18px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  transition: background 0.12s ease;
+  border-bottom: 1px solid #f2f4f6;
+}
+
+.search__item:last-child { border-bottom: none; }
+
+.search__item:hover,
+.search__item--active {
+  background: #e8f0fe;
+  color: var(--accent);
+}
+
+.search__item-team {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  font-weight: 500;
+}
+
+.search__no-results {
+  padding: 16px;
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+}
+
+/* ── Silhouette ─────────────────────────────────────────── */
+.silhouette {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.silhouette__btn {
+  background: var(--card);
+  border: 2px solid var(--border);
+  color: var(--text);
+  padding: 10px 28px;
+  border-radius: 24px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-family: var(--font);
+  font-weight: 600;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
+}
+
+.silhouette__btn:hover {
+  background: #1a1a2e;
+  border-color: #1a1a2e;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.silhouette__btn:active {
+  transform: translateY(0) scale(0.97);
+}
+
+.silhouette__img {
+  display: none;
+  max-width: 200px;
+  margin: 16px auto 0;
+  border-radius: var(--radius);
+  filter: brightness(0);
+  opacity: 0.9;
+  box-shadow: var(--shadow);
+}
+
+.silhouette__img--visible { display: block; }
+
+.silhouette__img--revealed {
+  filter: none;
+  opacity: 1;
+  box-shadow: var(--shadow-lg);
+}
+
+/* ── Guess Table ─────────────────────────────────────────── */
+.guess-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-bottom: 16px;
+  background: var(--card);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.guess-table th {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+  padding: 12px 6px 10px;
+  text-align: center;
+  background: #fafbfc;
+  border-bottom: 2px solid var(--border);
+}
+
+.guess-table td {
+  padding: 12px 6px;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition: transform 0.15s ease;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.guess-table tbody tr:last-child td { border-bottom: none; }
+
+.guess-table tbody tr:hover td {
+  transform: scale(1.01);
+}
+
+/* ── Cell States ─────────────────────────────────────────── */
+.cell--green {
+  background: var(--green);
+  color: #fff;
+}
+
+.cell--yellow {
+  background: var(--yellow);
+  color: #fff;
+}
+
+.cell--black {
+  background: var(--black-cell);
+  color: #aaa;
+}
+
+.cell-arrow {
+  font-size: 0.7rem;
+  margin-left: 2px;
+  opacity: 0.85;
+}
+
+/* ── Guess Row Animation ─────────────────────────────────── */
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.guess-row { animation: fadeInDown 0.4s ease forwards; }
+
+.guess-row td { animation: cellReveal 0.45s ease forwards; }
+
+@keyframes cellReveal {
+  0% { transform: rotateX(90deg) scale(0.9); opacity: 0; }
+  50% { transform: rotateX(-8deg) scale(1.03); }
+  100% { transform: rotateX(0) scale(1); opacity: 1; }
+}
+
+/* ── Status Bar ──────────────────────────────────────────── */
+.status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 4px;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  font-weight: 500;
+}
+
+.status-bar__remaining {
+  font-weight: 700;
+  color: var(--text);
+  font-size: 1.1rem;
+}
+
+/* ── Game Over Overlay ───────────────────────────────────── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 200;
+  animation: fadeIn 0.3s ease;
+}
+
+.overlay--visible { display: flex; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.overlay__card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 36px 28px;
+  text-align: center;
+  max-width: 360px;
+  width: 90%;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.2);
+  animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.overlay__title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.overlay__subtitle {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin-bottom: 20px;
+}
+
+.overlay__answer {
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
+}
+
+.overlay__answer-team {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  margin-bottom: 24px;
+  font-weight: 500;
+}
+
+/* ── Share ───────────────────────────────────────────────── */
+.share__grid {
+  font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+  font-size: 1rem;
+  letter-spacing: 2px;
+  line-height: 1.9;
+  margin: 16px 0;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  background: #f6f7f9;
+  padding: 14px;
+  border-radius: var(--radius);
+  max-width: 100%;
+}
+
+.share__btn {
+  background: var(--green);
+  color: #fff;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 24px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(67,160,71,0.3);
+}
+
+.share__btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(67,160,71,0.4);
+}
+
+.share__btn:active {
+  transform: translateY(0) scale(0.97);
+}
+
+.share__btn--play-again {
+  background: var(--card);
+  border: 2px solid var(--border);
+  color: var(--text);
+  margin-left: 8px;
+  box-shadow: var(--shadow-sm);
+}
+
+.share__btn--play-again:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: var(--shadow);
+}
+
+/* ── Toast ───────────────────────────────────────────────── */
+.toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a2e;
+  color: #fff;
+  padding: 12px 28px;
+  border-radius: 24px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  z-index: 300;
+  opacity: 0;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+  box-shadow: var(--shadow-lg);
+}
+
+.toast--visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-6px);
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .header { padding: 24px 0 16px; }
+  .header__title { font-size: 1.35rem; }
+  .guess-table th { font-size: 0.62rem; padding: 10px 3px 8px; letter-spacing: 0.06em; }
+  .guess-table td { font-size: 0.75rem; padding: 10px 4px; }
+  .search__input { font-size: 0.9rem; padding: 12px 14px; }
+  .overlay__card { padding: 28px 20px; }
+  .overlay__answer { font-size: 1.15rem; }
+  .share__grid { font-size: 0.85rem; letter-spacing: 1px; }
+}
+
+@media (max-width: 375px) {
+  .overlay__card { padding: 24px 16px; }
+  .overlay__answer { font-size: 1.05rem; }
+  .share__grid { font-size: 0.75rem; letter-spacing: 1px; }
+  .guess-table th { font-size: 0.55rem; padding: 8px 2px 6px; letter-spacing: 0; }
+  .guess-table td { font-size: 0.7rem; padding: 8px 2px; }
+  .container { padding: 0 8px; }
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <header class="header">
+    <h1 class="header__title">🏀 NBA Mystery Player</h1>
+    <p class="header__subtitle">Guess the hidden player — endless mode</p>
+    <button id="newGameBtn" class="header__new-game">🔄 New Game</button>
+  </header>
+
+  <!-- Search -->
+  <div class="search-wrapper">
+    <input
+      type="text"
+      id="searchInput"
+      class="search__input"
+      placeholder="🔍  Type a player name..."
+      autocomplete="off"
+      autocorrect="off"
+      autocapitalize="off"
+      spellcheck="false"
+    >
+    <div id="searchDropdown" class="search__dropdown"></div>
+  </div>
+
+  <!-- Silhouette Hint -->
+  <div class="silhouette">
+    <button id="silhouetteBtn" class="silhouette__btn">👤 Reveal Silhouette</button>
+    <img id="silhouetteImg" class="silhouette__img"
+         src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+         alt="Player silhouette"
+         onerror="this.style.display='none'">
+  </div>
+
+  <!-- Guess Table -->
+  <table class="guess-table">
+    <thead>
+      <tr>
+        <th>Team</th>
+        <th>Conf</th>
+        <th>Div</th>
+        <th>Pos</th>
+        <th>Ht</th>
+        <th>Age</th>
+        <th>#</th>
+      </tr>
+    </thead>
+    <tbody id="guessBody">
+      <!-- Guesses rendered here -->
+    </tbody>
+  </table>
+
+  <!-- Status -->
+  <div class="status-bar">
+    <span>Guesses remaining:</span>
+    <span class="status-bar__remaining" id="remaining">8</span>
+    <span>/ 8</span>
+  </div>
+</div>
+
+<!-- Game Over Overlay -->
+<div id="overlay" class="overlay">
+  <div class="overlay__card">
+    <div id="overlayTitle" class="overlay__title"></div>
+    <div id="overlaySubtitle" class="overlay__subtitle"></div>
+    <div id="overlayAnswer" class="overlay__answer"></div>
+    <div id="overlayAnswerTeam" class="overlay__answer-team"></div>
+    <div id="shareGrid" class="share__grid"></div>
+    <button id="shareBtn" class="share__btn">📋 Copy Share</button>
+    <button id="playAgainBtn" class="share__btn share__btn--play-again">▶ Play Again</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// PLAYER DATA (auto-generated)
+// ═══════════════════════════════════════════════════════════════
 // Auto-generated NBA player data
+// Generated: 2026-07-03T14:16:48.830486
 // Total players: 530
 
 const PLAYERS = [
@@ -533,3 +1103,521 @@ const PLAYERS = [
   {"id":528,"name":"Thomas Sorber","team":"OKC","conf":"West","div":"Northwest","pos":["C"],"ht":"6-9","htInches":81,"age":20,"jersey":"12","formerTeams":[],"nbaId":1642850},
   {"id":529,"name":"Fred VanVleet","team":"HOU","conf":"West","div":"Southwest","pos":["G"],"ht":"6-0","htInches":72,"age":32,"jersey":"5","formerTeams":[],"nbaId":1627832}
 ];
+
+
+// ═══════════════════════════════════════════════════════════════
+// GAME LOGIC
+// ═══════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════
+   NBA MYSTERY PLAYER — Game Logic
+   ═══════════════════════════════════════════════════════════ */
+
+// ── Constants ──────────────────────────────────────────────
+const MAX_GUESSES = 8;
+const STORAGE_KEY = 'nbaMysteryPlayer';
+const COLUMNS = ['Team', 'Conf', 'Div', 'Pos', 'Ht', 'Age', '#'];
+
+// ── State ──────────────────────────────────────────────────
+let mysteryPlayer = null;
+let guesses = [];
+let gameOver = false;
+
+// ── DOM Refs ───────────────────────────────────────────────
+const dom = {
+  searchInput: null,
+  searchDropdown: null,
+  guessBody: null,
+  remainingEl: null,
+  silhouetteBtn: null,
+  silhouetteImg: null,
+  overlay: null,
+  toast: null,
+};
+
+// ── Random Selection ───────────────────────────────────────
+function getRandomIndex() {
+  return Math.floor(Math.random() * PLAYERS.length);
+}
+
+// ── Init ───────────────────────────────────────────────────
+function initGame() {
+  cacheDom();
+  loadState();
+
+  if (!mysteryPlayer) {
+    const idx = getRandomIndex();
+    mysteryPlayer = PLAYERS[idx];
+    guesses = [];
+    gameOver = false;
+    saveState();
+    clearTable();
+    updateRemaining();
+  }
+
+  renderExistingGuesses();
+  updateRemaining();
+  bindEvents();
+
+  if (gameOver) {
+    dom.searchInput.disabled = true;
+    dom.searchInput.placeholder = 'Game over';
+  }
+
+  console.log(`Mystery player: ${mysteryPlayer.name} (#${mysteryPlayer.id})`);
+
+  // Preload silhouette image in background
+  preloadSilhouette();
+}
+
+function cacheDom() {
+  dom.searchInput = document.getElementById('searchInput');
+  dom.searchDropdown = document.getElementById('searchDropdown');
+  dom.guessBody = document.getElementById('guessBody');
+  dom.remainingEl = document.getElementById('remaining');
+  dom.silhouetteBtn = document.getElementById('silhouetteBtn');
+  dom.silhouetteImg = document.getElementById('silhouetteImg');
+  dom.overlay = document.getElementById('overlay');
+  dom.toast = document.getElementById('toast');
+}
+
+// ── State Persistence ──────────────────────────────────────
+function saveState() {
+  const state = {
+    date: new Date().toISOString().slice(0, 10),
+    mysteryId: mysteryPlayer ? mysteryPlayer.id : null,
+    guesses: guesses,
+    gameOver: gameOver,
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  localStorage.setItem(STORAGE_KEY + '_date', state.date);
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const state = JSON.parse(raw);
+      guesses = state.guesses || [];
+      gameOver = state.gameOver || false;
+      if (state.mysteryId !== null && state.mysteryId !== undefined) {
+        mysteryPlayer = PLAYERS.find(p => p.id === state.mysteryId) || null;
+      }
+    }
+  } catch (e) {
+    guesses = [];
+    gameOver = false;
+  }
+}
+
+// ── Search / Autocomplete ──────────────────────────────────
+let activeIndex = -1;
+let searchResults = [];
+
+function bindEvents() {
+  dom.searchInput.addEventListener('input', onSearchInput);
+  dom.searchInput.addEventListener('keydown', onSearchKeydown);
+  dom.searchInput.addEventListener('focus', onSearchInput);
+  document.addEventListener('click', onDocumentClick);
+  dom.silhouetteBtn.addEventListener('click', toggleSilhouette);
+  document.getElementById('newGameBtn').addEventListener('click', resetGame);
+
+  // Overlay buttons
+  document.getElementById('shareBtn').addEventListener('click', copyShare);
+  document.getElementById('playAgainBtn')?.addEventListener('click', resetGame);
+}
+
+function onSearchInput() {
+  const query = dom.searchInput.value.trim().toLowerCase();
+  activeIndex = -1;
+
+  if (!query) {
+    dom.searchDropdown.classList.remove('search__dropdown--open');
+    searchResults = [];
+    return;
+  }
+
+  // Filter players by name substring (case-insensitive, accent-insensitive)
+  searchResults = PLAYERS
+    .filter(p => normalizeStr(p.name).includes(normalizeStr(query)))
+    .slice(0, 8);
+
+  renderDropdown(searchResults);
+}
+
+function renderDropdown(results) {
+  dom.searchDropdown.innerHTML = '';
+
+  if (results.length === 0) {
+    dom.searchDropdown.innerHTML =
+      '<div class="search__no-results">No players found</div>';
+  } else {
+    results.forEach((p, i) => {
+      const div = document.createElement('div');
+      div.className = 'search__item';
+      div.innerHTML = `<span>${escapeHtml(p.name)}</span>
+        <span class="search__item-team">${p.team} ${p.pos.join('-')}</span>`;
+      div.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        selectPlayer(p);
+      });
+      dom.searchDropdown.appendChild(div);
+    });
+  }
+
+  dom.searchDropdown.classList.add('search__dropdown--open');
+}
+
+function onSearchKeydown(e) {
+  const items = dom.searchDropdown.querySelectorAll('.search__item');
+
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    activeIndex = Math.min(activeIndex + 1, items.length - 1);
+    updateActiveItem(items);
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    activeIndex = Math.max(activeIndex - 1, 0);
+    updateActiveItem(items);
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (activeIndex >= 0 && searchResults[activeIndex]) {
+      selectPlayer(searchResults[activeIndex]);
+    }
+  } else if (e.key === 'Escape') {
+    dom.searchDropdown.classList.remove('search__dropdown--open');
+    dom.searchInput.blur();
+  }
+}
+
+function updateActiveItem(items) {
+  items.forEach((item, i) => {
+    item.classList.toggle('search__item--active', i === activeIndex);
+  });
+  if (activeIndex >= 0 && items[activeIndex]) {
+    items[activeIndex].scrollIntoView({ block: 'nearest' });
+  }
+}
+
+function onDocumentClick(e) {
+  if (!dom.searchInput.contains(e.target) && !dom.searchDropdown.contains(e.target)) {
+    dom.searchDropdown.classList.remove('search__dropdown--open');
+  }
+}
+
+// ── Player Selection & Guessing ────────────────────────────
+function selectPlayer(player) {
+  if (gameOver) return;
+
+  // Check duplicate
+  if (guesses.some(g => g.id === player.id)) {
+    showToast('Already guessed this player');
+    return;
+  }
+
+  // Submit guess
+  guesses.push(player);
+  addGuessRow(player);
+
+  dom.searchInput.value = '';
+  dom.searchDropdown.classList.remove('search__dropdown--open');
+  searchResults = [];
+  activeIndex = -1;
+
+  updateRemaining();
+  saveState();
+
+  // Check win
+  if (player.id === mysteryPlayer.id) {
+    endGame(true);
+  } else if (guesses.length >= MAX_GUESSES) {
+    endGame(false);
+  }
+}
+
+// ── Comparison Engine ──────────────────────────────────────
+function compareTeam(guess, answer) {
+  if (guess.team === answer.team) return 'green';
+  if (answer.formerTeams.includes(guess.team)) return 'yellow';
+  return 'black';
+}
+
+function compareConf(guess, answer) {
+  return guess.conf === answer.conf ? 'green' : 'black';
+}
+
+function compareDiv(guess, answer) {
+  return guess.div === answer.div ? 'green' : 'black';
+}
+
+function comparePos(guess, answer) {
+  const gSet = new Set(guess.pos);
+  const aSet = new Set(answer.pos);
+  if (gSet.size === aSet.size && [...gSet].every(x => aSet.has(x))) return 'green';
+  if ([...gSet].some(x => aSet.has(x))) return 'yellow';
+  return 'black';
+}
+
+function compareNumeric(guessVal, answerVal) {
+  const diff = Math.abs(guessVal - answerVal);
+  if (diff === 0) return { color: 'green', arrow: '' };
+  if (diff <= 2) {
+    const arrow = guessVal < answerVal ? '↑' : '↓';
+    return { color: 'yellow', arrow };
+  }
+  const arrow = guessVal < answerVal ? '↑' : '↓';
+  return { color: 'black', arrow };
+}
+
+function compareAll(guess, answer) {
+  return {
+    team: compareTeam(guess, answer),
+    conf: compareConf(guess, answer),
+    div: compareDiv(guess, answer),
+    pos: comparePos(guess, answer),
+    ht: compareNumeric(guess.htInches, answer.htInches),
+    age: compareNumeric(guess.age, answer.age),
+    jersey: compareJersey(guess.jersey, answer.jersey),
+  };
+}
+
+function compareJersey(gJersey, aJersey) {
+  // Normalize: "0", "00" → 0; non-numeric → -1
+  const gNum = parseInt(gJersey, 10);
+  const aNum = parseInt(aJersey, 10);
+  const gIsNum = !isNaN(gNum);
+  const aIsNum = !isNaN(aNum);
+
+  // Both numeric: compare numerically
+  if (gIsNum && aIsNum) {
+    if (gNum === aNum) return { color: 'green', arrow: '' };
+    const diff = Math.abs(gNum - aNum);
+    if (diff <= 2) {
+      return { color: 'yellow', arrow: gNum < aNum ? '↑' : '↓' };
+    }
+    return { color: 'black', arrow: gNum < aNum ? '↑' : '↓' };
+  }
+
+  // String comparison for non-numeric jerseys (e.g. "N/A")
+  if (gJersey === aJersey) return { color: 'green', arrow: '' };
+  return { color: 'black', arrow: '' };
+}
+
+// ── Render ─────────────────────────────────────────────────
+function addGuessRow(player) {
+  const result = compareAll(player, mysteryPlayer);
+  const row = document.createElement('tr');
+  row.className = 'guess-row';
+
+  // Determine cell order matching headers
+  const cells = [
+    { key: 'team', display: player.team },
+    { key: 'conf', display: player.conf },
+    { key: 'div', display: player.div },
+    { key: 'pos', display: player.pos.join('-') },
+    { key: 'ht', display: player.ht },
+    { key: 'age', display: String(player.age) },
+    { key: 'jersey', display: player.jersey },
+  ];
+
+  cells.forEach(cell => {
+    const td = document.createElement('td');
+    const res = result[cell.key];
+
+    if (cell.key === 'ht' || cell.key === 'age' || cell.key === 'jersey') {
+      // Numeric columns: res is { color, arrow }
+      td.className = `cell--${res.color}`;
+      td.innerHTML = `${cell.display}<span class="cell-arrow">${res.arrow}</span>`;
+    } else {
+      // Text columns (team/conf/div/pos): res is a color string directly
+      td.className = `cell--${res}`;
+      td.textContent = cell.display;
+    }
+    row.appendChild(td);
+  });
+
+  dom.guessBody.appendChild(row);
+}
+
+function renderExistingGuesses() {
+  dom.guessBody.innerHTML = '';
+  guesses.forEach(g => addGuessRow(g));
+}
+
+function clearTable() {
+  dom.guessBody.innerHTML = '';
+}
+
+function updateRemaining() {
+  const remaining = MAX_GUESSES - guesses.length;
+  dom.remainingEl.textContent = remaining;
+  if (remaining <= 3) {
+    dom.remainingEl.style.color = remaining <= 1 ? 'var(--danger)' : 'var(--yellow)';
+  } else {
+    dom.remainingEl.style.color = 'var(--text)';
+  }
+}
+
+// ── Game End ───────────────────────────────────────────────
+function endGame(won) {
+  gameOver = true;
+  saveState();
+  dom.searchInput.disabled = true;
+  dom.searchInput.placeholder = 'Game over';
+
+  // Reveal player photo on win
+  if (won) {
+    revealPlayerImage();
+  }
+
+  setTimeout(() => {
+    showOverlay(won);
+  }, won ? 600 : 1000);
+}
+
+function revealPlayerImage() {
+  if (mysteryPlayer && mysteryPlayer.nbaId) {
+    dom.silhouetteImg.src = getHeadshotUrl(mysteryPlayer.nbaId);
+  }
+  dom.silhouetteImg.classList.add('silhouette__img--visible', 'silhouette__img--revealed');
+  dom.silhouetteBtn.textContent = '🙈 Hide Silhouette';
+}
+
+function resetGame() {
+  const idx = getRandomIndex();
+  mysteryPlayer = PLAYERS[idx];
+  guesses = [];
+  gameOver = false;
+
+  dom.searchInput.disabled = false;
+  dom.searchInput.placeholder = '🔍  Type a player name...';
+  dom.overlay.classList.remove('overlay--visible');
+
+  // Reset silhouette
+  dom.silhouetteImg.classList.remove('silhouette__img--visible', 'silhouette__img--revealed');
+  dom.silhouetteImg.src = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+  dom.silhouetteBtn.textContent = '👤 Reveal Silhouette';
+
+  clearTable();
+  updateRemaining();
+  saveState();
+  preloadSilhouette();
+
+  console.log(`New mystery player: ${mysteryPlayer.name} (#${mysteryPlayer.id})`);
+}
+
+function showOverlay(won) {
+  const titleEl = document.getElementById('overlayTitle');
+  const subtitleEl = document.getElementById('overlaySubtitle');
+  const answerEl = document.getElementById('overlayAnswer');
+  const answerTeamEl = document.getElementById('overlayAnswerTeam');
+  const shareGrid = document.getElementById('shareGrid');
+
+  if (won) {
+    titleEl.textContent = '🎉 You Got It!';
+    subtitleEl.textContent = `Solved in ${guesses.length}/${MAX_GUESSES} guesses`;
+  } else {
+    titleEl.textContent = '😞 Game Over';
+    subtitleEl.textContent = `The mystery player was:`;
+  }
+
+  answerEl.textContent = mysteryPlayer.name;
+  answerTeamEl.textContent = `${mysteryPlayer.team} | ${mysteryPlayer.pos.join('-')} | ${mysteryPlayer.ht}`;
+  shareGrid.textContent = generateShareGrid(won);
+
+  dom.overlay.classList.add('overlay--visible');
+}
+
+function generateShareGrid(won) {
+  const date = new Date().toISOString().slice(0, 10);
+  let text = `🏀 NBA Mystery Player ${date} 🏀\n`;
+
+  guesses.forEach(g => {
+    const result = compareAll(g, mysteryPlayer);
+    const emojis = [
+      result.team, result.conf, result.div, result.pos,
+      result.ht.color, result.age.color, result.jersey.color,
+    ].map(c => {
+      if (c === 'green' || (c.color === 'green')) return '🟩';
+      if (c === 'yellow' || (c.color === 'yellow')) return '🟨';
+      return '⬛';
+    }).join('');
+    text += emojis + '\n';
+  });
+
+  if (won) {
+    text += `Solved in ${guesses.length}/${MAX_GUESSES}!`;
+  } else {
+    text += `Failed after ${MAX_GUESSES} guesses`;
+  }
+
+  return text;
+}
+
+function copyShare() {
+  const won = guesses.length > 0 && guesses[guesses.length - 1].id === mysteryPlayer.id;
+  const text = generateShareGrid(won);
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('Copied to clipboard!');
+  }).catch(() => {
+    showToast('Failed to copy');
+  });
+}
+
+// ── Silhouette ─────────────────────────────────────────────
+function getHeadshotUrl(nbaId) {
+  // 260x190 loads ~10x faster than 1040x760, sufficient for 200px display
+  return `https://cdn.nba.com/headshots/nba/latest/260x190/${nbaId}.png`;
+}
+
+function preloadSilhouette() {
+  if (mysteryPlayer && mysteryPlayer.nbaId) {
+    const img = new Image();
+    img.src = getHeadshotUrl(mysteryPlayer.nbaId);
+  }
+}
+
+function toggleSilhouette() {
+  const isVisible = dom.silhouetteImg.classList.contains('silhouette__img--visible');
+  if (isVisible) {
+    dom.silhouetteImg.classList.remove('silhouette__img--visible');
+    dom.silhouetteBtn.textContent = '👤 Reveal Silhouette';
+  } else {
+    if (mysteryPlayer && mysteryPlayer.nbaId) {
+      dom.silhouetteImg.src = getHeadshotUrl(mysteryPlayer.nbaId);
+    }
+    dom.silhouetteImg.classList.add('silhouette__img--visible');
+    dom.silhouetteBtn.textContent = '🙈 Hide Silhouette';
+  }
+}
+
+// ── Toast ──────────────────────────────────────────────────
+let toastTimer = null;
+
+function showToast(msg) {
+  dom.toast.textContent = msg;
+  dom.toast.classList.add('toast--visible');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    dom.toast.classList.remove('toast--visible');
+  }, 2000);
+}
+
+// ── Utils ──────────────────────────────────────────────────
+function normalizeStr(str) {
+  // Strip diacritics so "Dončić" matches "Doncic"
+  return str.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// ── Bootstrap ──────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', initGame);
+
+</script>
+
+</body>
+</html>
