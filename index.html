@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>NBA Mystery Player</title>
+<meta name="description" content="Guess the hidden NBA player! A new mystery player every day.">
+<meta name="theme-color" content="#1a1a1a">
+<style>
+/* ═══════════════════════════════════════════════════════════
+   NBA MYSTERY PLAYER — Light Vibrant Styles
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  --bg: #f5f6f8;
+  --card: #ffffff;
+  --text: #1a1a2e;
+  --text-dim: #999;
+  --green: #43a047;
+  --yellow: #f5a623;
+  --black-cell: #e8ecf0;
+  --border: #e0e4e8;
+  --input-bg: #ffffff;
+  --input-focus: #e8f0fe;
+  --danger: #e74c3c;
+  --radius: 10px;
+  --font: system-ui, -apple-system, sans-serif;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+  --shadow: 0 2px 10px rgba(0,0,0,0.07);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+  --accent: #1a73e8;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.5;
+}
+
+/* ── Layout ─────────────────────────────────────────────── */
+.container {
+  width: 100%;
+  max-width: 600px;
+  padding: 0 16px;
+  margin: 0 auto;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+.header {
+  text-align: center;
+  padding: 36px 0 24px;
+}
+
+.header__title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.header__subtitle {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.header__new-game {
+  margin-top: 12px;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  color: var(--text);
+  padding: 8px 22px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-family: var(--font);
+  font-weight: 600;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
+}
+
+.header__new-game:hover {
+  background: #f0f4ff;
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.header__new-game:active {
+  transform: translateY(0) scale(0.97);
+}
+
+/* ── Search ─────────────────────────────────────────────── */
+.search-wrapper {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.search__input {
+  width: 100%;
+  padding: 14px 18px;
+  background: var(--input-bg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 1rem;
+  font-family: var(--font);
+  outline: none;
+  transition: all 0.25s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.search__input:focus {
+  border-color: var(--accent);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(26,115,232,0.1);
+}
+
+.search__input::placeholder { color: var(--text-dim); }
+
+.search__dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 320px;
+  overflow-y: auto;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  z-index: 100;
+  display: none;
+  box-shadow: var(--shadow-lg);
+}
+
+.search__dropdown--open { display: block; }
+
+.search__item {
+  padding: 12px 18px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  transition: background 0.12s ease;
+  border-bottom: 1px solid #f2f4f6;
+}
+
+.search__item:last-child { border-bottom: none; }
+
+.search__item:hover,
+.search__item--active {
+  background: #e8f0fe;
+  color: var(--accent);
+}
+
+.search__item-team {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  font-weight: 500;
+}
+
+.search__no-results {
+  padding: 16px;
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+}
+
+/* ── Silhouette ─────────────────────────────────────────── */
+.silhouette {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.silhouette__btn {
+  background: var(--card);
+  border: 2px solid var(--border);
+  color: var(--text);
+  padding: 10px 28px;
+  border-radius: 24px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-family: var(--font);
+  font-weight: 600;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
+}
+
+.silhouette__btn:hover {
+  background: #1a1a2e;
+  border-color: #1a1a2e;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.silhouette__btn:active {
+  transform: translateY(0) scale(0.97);
+}
+
+.silhouette__img {
+  display: none;
+  max-width: 200px;
+  margin: 16px auto 0;
+  border-radius: var(--radius);
+  filter: brightness(0);
+  opacity: 0.9;
+  box-shadow: var(--shadow);
+}
+
+.silhouette__img--visible { display: block; }
+
+.silhouette__img--revealed {
+  filter: none;
+  opacity: 1;
+  box-shadow: var(--shadow-lg);
+}
+
+/* ── Guess Table ─────────────────────────────────────────── */
+.guess-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-bottom: 16px;
+  background: var(--card);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.guess-table th {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+  padding: 12px 6px 10px;
+  text-align: center;
+  background: #fafbfc;
+  border-bottom: 2px solid var(--border);
+}
+
+.guess-table td {
+  padding: 12px 6px;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition: transform 0.15s ease;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.guess-table tbody tr:last-child td { border-bottom: none; }
+
+.guess-table tbody tr:hover td {
+  transform: scale(1.01);
+}
+
+/* ── Cell States ─────────────────────────────────────────── */
+.cell--green {
+  background: var(--green);
+  color: #fff;
+}
+
+.cell--yellow {
+  background: var(--yellow);
+  color: #fff;
+}
+
+.cell--black {
+  background: var(--black-cell);
+  color: #aaa;
+}
+
+.cell-arrow {
+  font-size: 0.7rem;
+  margin-left: 2px;
+  opacity: 0.85;
+}
+
+/* ── Guess Row Animation ─────────────────────────────────── */
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.guess-row { animation: fadeInDown 0.4s ease forwards; }
+
+.guess-row td { animation: cellReveal 0.45s ease forwards; }
+
+@keyframes cellReveal {
+  0% { transform: rotateX(90deg) scale(0.9); opacity: 0; }
+  50% { transform: rotateX(-8deg) scale(1.03); }
+  100% { transform: rotateX(0) scale(1); opacity: 1; }
+}
+
+/* ── Status Bar ──────────────────────────────────────────── */
+.status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 4px;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  font-weight: 500;
+}
+
+.status-bar__remaining {
+  font-weight: 700;
+  color: var(--text);
+  font-size: 1.1rem;
+}
+
+/* ── Game Over Overlay ───────────────────────────────────── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 200;
+  animation: fadeIn 0.3s ease;
+}
+
+.overlay--visible { display: flex; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.overlay__card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 36px 28px;
+  text-align: center;
+  max-width: 360px;
+  width: 90%;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.2);
+  animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.overlay__title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.overlay__subtitle {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin-bottom: 20px;
+}
+
+.overlay__answer {
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
+}
+
+.overlay__answer-team {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  margin-bottom: 24px;
+  font-weight: 500;
+}
+
+/* ── Share ───────────────────────────────────────────────── */
+.share__grid {
+  font-family: 'SF Mono', 'Fira Code', 'Courier New', monospace;
+  font-size: 1rem;
+  letter-spacing: 2px;
+  line-height: 1.9;
+  margin: 16px 0;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  background: #f6f7f9;
+  padding: 14px;
+  border-radius: var(--radius);
+  max-width: 100%;
+}
+
+.share__btn {
+  background: var(--green);
+  color: #fff;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 24px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(67,160,71,0.3);
+}
+
+.share__btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(67,160,71,0.4);
+}
+
+.share__btn:active {
+  transform: translateY(0) scale(0.97);
+}
+
+.share__btn--play-again {
+  background: var(--card);
+  border: 2px solid var(--border);
+  color: var(--text);
+  margin-left: 8px;
+  box-shadow: var(--shadow-sm);
+}
+
+.share__btn--play-again:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: var(--shadow);
+}
+
+/* ── Toast ───────────────────────────────────────────────── */
+.toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1a1a2e;
+  color: #fff;
+  padding: 12px 28px;
+  border-radius: 24px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  z-index: 300;
+  opacity: 0;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+  box-shadow: var(--shadow-lg);
+}
+
+.toast--visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-6px);
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .header { padding: 24px 0 16px; }
+  .header__title { font-size: 1.35rem; }
+  .guess-table th { font-size: 0.62rem; padding: 10px 3px 8px; letter-spacing: 0.06em; }
+  .guess-table td { font-size: 0.75rem; padding: 10px 4px; }
+  .search__input { font-size: 0.9rem; padding: 12px 14px; }
+  .overlay__card { padding: 28px 20px; }
+  .overlay__answer { font-size: 1.15rem; }
+  .share__grid { font-size: 0.85rem; letter-spacing: 1px; }
+}
+
+@media (max-width: 375px) {
+  .overlay__card { padding: 24px 16px; }
+  .overlay__answer { font-size: 1.05rem; }
+  .share__grid { font-size: 0.75rem; letter-spacing: 1px; }
+  .guess-table th { font-size: 0.55rem; padding: 8px 2px 6px; letter-spacing: 0; }
+  .guess-table td { font-size: 0.7rem; padding: 8px 2px; }
+  .container { padding: 0 8px; }
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <header class="header">
+    <h1 class="header__title">🏀 NBA Mystery Player</h1>
+    <p class="header__subtitle">Guess the hidden player — endless mode</p>
+    <button id="newGameBtn" class="header__new-game">🔄 New Game</button>
+  </header>
+
+  <!-- Search -->
+  <div class="search-wrapper">
+    <input
+      type="text"
+      id="searchInput"
+      class="search__input"
+      placeholder="🔍  Type a player name..."
+      autocomplete="off"
+      autocorrect="off"
+      autocapitalize="off"
+      spellcheck="false"
+    >
+    <div id="searchDropdown" class="search__dropdown"></div>
+  </div>
+
+  <!-- Silhouette Hint -->
+  <div class="silhouette">
+    <button id="silhouetteBtn" class="silhouette__btn">👤 Reveal Silhouette</button>
+    <img id="silhouetteImg" class="silhouette__img"
+         src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+         alt="Player silhouette"
+         onerror="this.style.display='none'">
+  </div>
+
+  <!-- Guess Table -->
+  <table class="guess-table">
+    <thead>
+      <tr>
+        <th>Team</th>
+        <th>Conf</th>
+        <th>Div</th>
+        <th>Pos</th>
+        <th>Ht</th>
+        <th>Age</th>
+        <th>#</th>
+      </tr>
+    </thead>
+    <tbody id="guessBody">
+      <!-- Guesses rendered here -->
+    </tbody>
+  </table>
+
+  <!-- Status -->
+  <div class="status-bar">
+    <span>Guesses remaining:</span>
+    <span class="status-bar__remaining" id="remaining">8</span>
+    <span>/ 8</span>
+  </div>
+</div>
+
+<!-- Game Over Overlay -->
+<div id="overlay" class="overlay">
+  <div class="overlay__card">
+    <div id="overlayTitle" class="overlay__title"></div>
+    <div id="overlaySubtitle" class="overlay__subtitle"></div>
+    <div id="overlayAnswer" class="overlay__answer"></div>
+    <div id="overlayAnswerTeam" class="overlay__answer-team"></div>
+    <div id="shareGrid" class="share__grid"></div>
+    <button id="shareBtn" class="share__btn">📋 Copy Share</button>
+    <button id="playAgainBtn" class="share__btn share__btn--play-again">▶ Play Again</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// PLAYER DATA (auto-generated)
+// ═══════════════════════════════════════════════════════════════
+// Auto-generated NBA player data
+// Generated: 2026-07-03T14:16:48.830486
+// Total players: 530
+
+const PLAYERS = [
+  {"id":0,"name":"Precious Achiuwa","team":"SAC","conf":"West","div":"Pacific","pos":["F"],"ht":"6-8","htInches":80,"age":26,"jersey":"9","formerTeams":["MIA", "NYK", "TOR"],"nbaId":1630173},
+  {"id":1,"name":"Steven Adams","team":"HOU","conf":"West","div":"Southwest","pos":["C"],"ht":"6-11","htInches":83,"age":32,"jersey":"12","formerTeams":["MEM", "NOP", "OKC"],"nbaId":203500},
+  {"id":2,"name":"Bam Adebayo","team":"MIA","conf":"East","div":"Southeast","pos":["C", "F"],"ht":"6-9","htInches":81,"age":28,"jersey":"13","formerTeams":[],"nbaId":1628389},
+  {"id":3,"name":"Ochai Agbaji","team":"BKN","conf":"East","div":"Atlantic","pos":["G"],"ht":"6-5","htInches":77,"age":26,"jersey":"30","formerTeams":["TOR", "UTA"],"nbaId":1630534},
+  {"id":4,"name":"Santi Aldama","team":"MEM","conf":"West","div":"Southwest","pos":["F", "C"],"ht":"7-0","htInches":84,"age":25,"jersey":"7","formerTeams":[],"nbaId":1630583},
+  {"id":5,"name":"Trey Alexander","team":"NOP","conf":"West","div":"Southwest","pos":["G"],"ht":"6-5","htInches":77,"age":23,"jersey":"23","formerTeams":["DEN"],"nbaId":1641725},
+  {"id":6,"name":"Nickeil Alexander-Walker","team":"ATL","conf":"East","div":"Southeast","pos":["G"],"ht":"6-5","htInches":77,"age":27,"jersey":"7","formerTeams":["MIN", "NOP", "UTA"],"nbaId":1629638},
+  {"id":7,"name":"Grayson Allen","team":"PHX","conf":"West","div":"Pacific","pos":["G"],"ht":"6-3","htInches":75,"age":30,"jersey":"8","formerTeams":["MEM", "MIL", "UTA"],"nbaId":1628960},
+  {"id":8,"name":"Jarrett Allen","team":"CLE","conf":"East","div":"Central","pos":["C"],"ht":"6-9","htInches":81,"age":28,"jersey":"31","formerTeams":["BKN"],"nbaId":1628386},
+  {"id":9,"name":"Jose Alvarado","team":"NYK","conf":"East","div":"Atlantic","pos":["G"],"ht":"6-0","htInches":72,"age":28,"jersey":"5","formerTeams":["NOP"],"nbaId":1630631},
+  {"id":10,"name":"Kyle Anderson","team":"MIN","conf":"West","div":"Northwest","pos":["F", "G"],"ht":"6-8","htInches":80,"age":32,"jersey":"12","formerTeams":["MEM", "MIA", "SAS"],"nbaId":203937},
+  {"id":11,"name":"Alex Antetokounmpo","team":"MIL","conf":"East","div":"Central","pos":["F"],"ht":"6-8","htInches":80,"age":24,"jersey":"29","formerTeams":[],"nbaId":1630828},
+  {"id":12,"name":"Giannis Antetokounmpo","team":"MIL","conf":"East","div":"Central","pos":["F"],"ht":"6-11","htInches":83,"age":31,"jersey":"34","formerTeams":[],"nbaId":203507},
+  {"id":13,"name":"Thanasis Antetokounmpo","team":"MIL","conf":"East","div":"Central","pos":["F"],"ht":"6-7","htInches":79,"age":33,"jersey":"43","formerTeams":["NYK"],"nbaId":203648},
+  {"id":14,"name":"OG Anunoby","team":"NYK","conf":"East","div":"Atlantic","pos":["F", "G"],"ht":"6-7","htInches":79,"age":28,"jersey":"8","formerTeams":["TOR"],"nbaId":1628384},
+  {"id":15,"name":"Deni Avdija","team":"POR","conf":"West","div":"Northwest","pos":["F"],"ht":"6-8","htInches":80,"age":25,"jersey":"8","formerTeams":["WAS"],"nbaId":1630166},
+  {"id":16,"name":"Deandre Ayton","team":"LAL","conf":"West","div":"Pacific","pos":["C"],"ht":"7-0","htInches":84,"age":27,"jersey":"5","formerTeams":["PHX", "POR"],"nbaId":1629028},
+  {"id":17,"name":"Marvin Bagley III","team":"DAL","conf":"West","div":"Southwest","pos":["F"],"ht":"6-10","htInches":82,"age":27,"jersey":"35","formerTeams":["DET", "MEM", "SAC", "WAS"],"nbaId":1628963},
+  {"id":18,"name":"Ace Bailey","team":"UTA","conf":"West","div":"Northwest","pos":["F"],"ht":"6-9","htInches":81,"age":19,"jersey":"19","formerTeams":[],"nbaId":1642846},
+  {"id":19,"name":"Patrick Baldwin Jr.","team":"SAC","conf":"West","div":"Pacific","pos":["F"],"ht":"7-0","htInches":84,"age":23,"jersey":"23","formerTeams":["GSW", "LAC", "WAS"],"nbaId":1631116},
+  {"id":20,"name":"LaMelo Ball","team":"CHA","conf":"East","div":"Southeast","pos":["G"],"ht":"6-7","htInches":79,"age":24,"jersey":"1","formerTeams":[],"nbaId":1630163},
+  {"id":21,"name":"Paolo Banchero","team":"ORL","conf":"East","div":"Southeast","pos":["F"],"ht":"6-10","htInches":82,"age":23,"jersey":"5","formerTeams":[],"nbaId":1631094},
+  {"id":22,"name":"Desmond Bane","team":"ORL","conf":"East","div":"Southeast","pos":["G"],"ht":"6-6","htInches":78,"age":28,"jersey":"3","formerTeams":["MEM"],"nbaId":1630217},
+  {"id":23,"name":"Dalano Banton","team":"BOS","conf":"East","div":"Atlantic","pos":["F"],"ht":"6-8","htInches":80,"age":26,"jersey":"45","formerTeams":["POR", "TOR"],"nbaId":1630625},
+  {"id":24,"name":"Dominick Barlow","team":"PHI","conf":"East","div":"Atlantic","pos":["F"],"ht":"6-9","htInches":81,"age":23,"jersey":"25","formerTeams":["ATL", "SAS"],"nbaId":1631230},
+  {"id":25,"name":"Harrison Barnes","team":"SAS","conf":"West","div":"Southwest","pos":["F"],"ht":"6-7","htInches":79,"age":34,"jersey":"40","formerTeams":["DAL", "GSW", "SAC"],"nbaId":203084},
+  {"id":26,"name":"Scottie Barnes","team":"TOR","conf":"East","div":"Atlantic","pos":["F", "G"],"ht":"6-8","htInches":80,"age":24,"jersey":"4","formerTeams":[],"nbaId":1630567},
+  {"id":27,"name":"Brooks Barnhizer","team":"OKC","conf":"West","div":"Northwest","pos":["G"],"ht":"6-5","htInches":77,"age":24,"jersey":"23","formerTeams":[],"nbaId":1642964},
+  {"id":28,"name":"RJ Barrett","team":"TOR","conf":"East","div":"Atlantic","pos":["F", "G"],"ht":"6-6","htInches":78,"age":26,"jersey":"9","formerTeams":["NYK"],"nbaId":1629628},
+  {"id":29,"name":"Charles Bassey","team":"GSW","conf":"West","div":"Pacific","pos":["C", "F"],"ht":"6-10","htInches":82,"age":25,"jersey":"28","formerTeams":["PHI", "SAS"],"nbaId":1629646},
+  {"id":30,"name":"Jamison Battle","team":"TOR","conf":"East","div":"Atlantic","pos":["F"],"ht":"6-7","htInches":79,"age":25,"jersey":"77","formerTeams":[],"nbaId":1642419},
+  {"id":31,"name":"Nicolas Batum","team":"LAC","conf":"West","div":"Pacific","pos":["G", "F"],"ht":"6-7","htInches":79,"age":37,"jersey":"33","formerTeams":["CHA", "PHI"],"nbaId":201587},
+  {"id":32,"name":"Bradley Beal","team":"LAC","conf":"West","div":"Pacific","pos":["G"],"ht":"6-4","htInches":76,"age":33,"jersey":"0","formerTeams":["PHX", "WAS"],"nbaId":203078},
+  {"id":33,"name":"MarJon Beauchamp","team":"PHI","conf":"East","div":"Atlantic","pos":["F"],"ht":"6-7","htInches":79,"age":25,"jersey":"16","formerTeams":["MIL", "NYK"],"nbaId":1630699},
+  {"id":34,"name":"Joan Beringer","team":"MIN","conf":"West","div":"Northwest","pos":["F"],"ht":"6-11","htInches":83,"age":19,"jersey":"19","formerTeams":[],"nbaId":1642866},
+  {"id":35,"name":"Saddiq Bey","team":"NOP","conf":"West","div":"Southwest","pos":["G", "F"],"ht":"6-8","htInches":80,"age":27,"jersey":"41","formerTeams":["ATL", "DET"],"nbaId":1630180},
+  {"id":36,"name":"Goga Bitadze","team":"ORL","conf":"East","div":"Southeast","pos":["C", "F"],"ht":"6-11","htInches":83,"age":26,"jersey":"35","formerTeams":["IND"],"nbaId":1629048},
+  {"id":37,"name":"Bismack Biyombo","team":"SAS","conf":"West","div":"Southwest","pos":["C"],"ht":"6-8","htInches":80,"age":33,"jersey":"18","formerTeams":["CHA", "OKC", "ORL", "PHX", "TOR"],"nbaId":202687},
+  {"id":38,"name":"Anthony Black","team":"ORL","conf":"East","div":"Southeast","pos":["G"],"ht":"6-7","htInches":79,"age":22,"jersey":"0","formerTeams":[],"nbaId":1641710},
+  {"id":39,"name":"Leaky Black","team":"WAS","conf":"East","div":"Southeast","pos":["F"],"ht":"6-6","htInches":78,"age":27,"jersey":"12","formerTeams":["CHA"],"nbaId":1641778},
+  {"id":40,"name":"Bogdan Bogdanovi\u0107","team":"LAC","conf":"West","div":"Pacific","pos":["G"],"ht":"6-5","htInches":77,"age":33,"jersey":"7","formerTeams":["ATL", "SAC"],"nbaId":203992},
+  {"id":41,"name":"Adem Bona","team":"PHI","conf":"East","div":"Atlantic","pos":["F"],"ht":"6-10","htInches":82,"age":23,"jersey":"30","formerTeams":[],"nbaId":1641737},
+  {"id":42,"name":"Devin Booker","team":"PHX","conf":"West","div":"Pacific","pos":["G"],"ht":"6-5","htInches":77,"age":29,"jersey":"15","formerTeams":[],"nbaId":1626164},
+  {"id":43,"name":"Jamaree Bouyea","team":"PHX","conf":"West","div":"Pacific","pos":["G"],"ht":"6-2","htInches":74,"age":27,"jersey":"17","formerTeams":["MIA", "MIL", "SAS"],"nbaId":1631123},
+  {"id":44,"name":"Tony Bradley","team":"ATL","conf":"East","div":"Southeast","pos":["C", "F"],"ht":"6-10","htInches":82,"age":28,"jersey":"13","formerTeams":["CHI", "IND", "OKC", "UTA"],"nbaId":1628396},
+  {"id":45,"name":"Christian Braun","team":"DEN","conf":"West","div":"Northwest","pos":["G"],"ht":"6-6","htInches":78,"age":25,"jersey":"0","formerTeams":[],"nbaId":1631128},
+  {"id":46,"name":"Koby Brea","team":"PHX","conf":"West","div":"Pacific","pos":["G"],"ht":"6-5","htInches":77,"age":23,"jersey":"14","formerTeams":[],"nbaId":1642886},
+  {"id":47,"name":"Mikal Bridges","team":"NYK","conf":"East","div":"Atlantic","pos":["G", "F"],"ht":"6-6","htInches":78,"age":29,"jersey":"25","formerTeams":["BKN", "PHX"],"nbaId":1628969},
+  {"id":48,"name":"Miles Bridges","team":"CHA","conf":"East","div":"Southeast","pos":["F"],"ht":"6-7","htInches":79,"age":28,"jersey":"0","formerTeams":[],"nbaId":1628970},
+  {"id":49,"name":"Dillon Brooks","team":"PHX","conf":"West","div":"Pacific","pos":["G", "F"],"ht":"6-7","htInches":79,"age":30,"jersey":"3","formerTeams":["HOU", "MEM"],"nbaId":1628415},
+  {"id":50,"name":"Johni Broome","team":"PHI","conf":"East","div":"Atlantic","pos":["F"],"ht":"6-9","htInches":81,"age":23,"jersey":"22","formerTeams":[],"nbaId":1641780},
+  {"id":51,"name":"Bruce Brown","team":"DEN","conf":"West","div":"Northwest","pos":["G", "F"],"ht":"6-4","htInches":76,"age":29,"jersey":"11","formerTeams":["BKN", "DET", "NOP", "TOR"],"nbaId":1628971},
+  {"id":52,"name":"Jaylen Brown","team":"BOS","conf":"East","div":"Atlantic","pos":["G", "F"],"ht":"6-6","htInches":78,"age":29,"jersey":"7","formerTeams":[],"nbaId":1627759},
+  {"id":53,"name":"Kobe Brown","team":"IND","conf":"East","div":"Central","pos":["F"],"ht":"6-7","htInches":79,"age":26,"jersey":"24","formerTeams":["LAC"],"nbaId":1641738},
+  {"id":54,"name":"Jalen Brunson","team":"NYK","conf":"East","div":"Atlantic","pos":["G"],"ht":"6-2","htInches":74,"age":29,"jersey":"11","formerTeams":["DAL"],"nbaId":1628973},
+  {"id":55,"name":"Carter Bryant","team":"SAS","conf":"West","div":"Southwest","pos":["F"],"ht":"6-6","htInches":78,"age":20,"jersey":"11","formerTeams":[],"nbaId":1642868},
+  {"id":56,"name":"Thomas Bryant","team":"CLE","conf":"East","div":"Central","pos":["C", "F"],"ht":"6-9","htInches":81,"age":28,"jersey":"3","formerTeams":["DEN", "IND", "LAL", "MIA", "WAS"],"nbaId":1628418},
+  {"id":57,"name":"Jimmy Butler III","team":"GSW","conf":"West","div":"Pacific","pos":["F"],"ht":"6-6","htInches":78,"age":36,"jersey":"10","formerTeams":["CHI", "MIA", "MIN", "PHI"],"nbaId":202710},
+  {"id":58,"name":"Matas Buzelis","team":"CHI","conf":"East","div":"Central","pos":["F"],"ht":"6-8","htInches":80,"age":21,"jersey":"14","formerTeams":[],"nbaId":1641824},
+  {"id":59,"name":"Jamal Cain","team":"ORL","conf":"East","div":"Southeast","pos":["F"],"ht":"6-7","htInches":79,"age":27,"jersey":"8","formerTeams":["MIA", "NOP"],"nbaId":1631288},
+  {"id":60,"name":"Kentavious Caldwell-Pope","team":"MEM","conf":"West","div":"Southwest","pos":["G"],"ht":"6-5","htInches":77,"age":33,"jersey":"3","formerTeams":["DEN", "DET", "LAL", "WAS"],"nbaId":203484},
+  {"id":61,"name":"Toumani Camara","team":"POR","conf":"West","div":"Northwest","pos":["F"],"ht":"6-7","htInches":79,"age":26,"jersey":"33","formerTeams":[],"nbaId":1641739},
+  {"id":62,"name":"Clint Capela","team":"HOU","conf":"West","div":"Southwest","pos":["C"],"ht":"6-10","htInches":82,"age":32,"jersey":"30","formerTeams":["ATL"],"nbaId":203991},
+  {"id":63,"name":"Dylan Cardwell","team":"SAC","conf":"West","div":"Pacific","pos":["C"],"ht":"6-10","htInches":82,"age":24,"jersey":"32","formerTeams":[],"nbaId":1642928},
+  {"id":64,"name":"Branden Carlson","team":"POR","conf":"West","div":"Northwest","pos":["C"],"ht":"7-0","htInches":84,"age":27,"jersey":"15","formerTeams":["OKC"],"nbaId":1642382},
+  {"id":65,"name":"Bub Carrington","team":"WAS","conf":"East","div":"Southeast","pos":["G"],"ht":"6-4","htInches":76,"age":20,"jersey":"7","formerTeams":[],"nbaId":1642267},
+  {"id":66,"name":"Devin Carter","team":"ATL","conf":"East","div":"Southeast","pos":["G"],"ht":"6-2","htInches":74,"age":24,"jersey":"22","formerTeams":["SAC"],"nbaId":1642269},
+  {"id":67,"name":"Jevon Carter","team":"ORL","conf":"East","div":"Southeast","pos":["G"],"ht":"6-0","htInches":72,"age":30,"jersey":"2","formerTeams":["CHI", "MEM", "MIL", "PHX"],"nbaId":1628975},
+  {"id":68,"name":"Wendell Carter Jr.","team":"ORL","conf":"East","div":"Southeast","pos":["C", "F"],"ht":"6-10","htInches":82,"age":27,"jersey":"34","formerTeams":["CHI"],"nbaId":1628976},
+  {"id":69,"name":"Alex Caruso","team":"OKC","conf":"West","div":"Northwest","pos":["G"],"ht":"6-5","htInches":77,"age":32,"jersey":"9","formerTeams":["CHI", "LAL"],"nbaId":1627936},
+  {"id":70,"name":"Stephon Castle","team":"SAS","conf":"West","div":"Southwest","pos":["G"],"ht":"6-6","htInches":78,"age":21,"jersey":"5","formerTeams":[],"nbaId":1642264},
+  {"id":71,"name":"Colin Castleton","team":"ORL","conf":"East","div":"Southeast","pos":["C"],"ht":"6-10","htInches":82,"age":26,"jersey":"14","formerTeams":["LAL", "TOR"],"nbaId":1630658},
+  {"id":72,"name":"Julian Champagnie","team":"SAS","conf":"West","div":"Southwest","pos":["F"],"ht":"6-7","htInches":79,"age":25,"jersey":"30","formerTeams":[],"nbaId":1630577},
+  {"id":73,"name":"Justin Champagnie","team":"WAS","conf":"East","div":"Southeast","pos":["G", "F"],"ht":"6-6","htInches":78,"age":25,"jersey":"9","formerTeams":["BOS", "TOR"],"nbaId":1630551},
+  {"id":74,"name":"Cam Christie","team":"LAC","conf":"West","div":"Pacific","pos":["G"],"ht":"6-5","htInches":77,"age":20,"jersey":"0","formerTeams":[],"nbaId":1642353},
+  {"id":75,"name":"Max Christie","team":"DAL","conf":"West","div":"Southwest","pos":["G"],"ht":"6-5","htInches":77,"age":23,"jersey":"0","formerTeams":["LAL"],"nbaId":1631108},
+  {"id":76,"name":"Moussa Cisse","team":"DAL","conf":"West","div":"Southwest","pos":["C"],"ht":"6-11","htInches":83,"age":23,"jersey":"30","formerTeams":[],"nbaId":1630619},
+  {"id":77,"name":"Sidy Cissoko","team":"POR","conf":"West","div":"Northwest","pos":["G"],"ht":"6-6","htInches":78,"age":22,"jersey":"91","formerTeams":["SAS"],"nbaId":1631321},
+  {"id":78,"name":"Jaylen Clark","team":"MIN","conf":"West","div":"Northwest","pos":["G"],"ht":"6-5","htInches":77,"age":24,"jersey":"22","formerTeams":[],"nbaId":1641740},
+  {"id":79,"name":"Brandon Clarke","team":"MEM","conf":"West","div":"Southwest","pos":["F"],"ht":"6-8","htInches":80,"age":29,"jersey":"15","formerTeams":[],"nbaId":1629634},
+  {"id":80,"name":"Jordan Clarkson","team":"NYK","conf":"East","div":"Atlantic","pos":["G"],"ht":"6-5","htInches":77,"age":34,"jersey":"00","formerTeams":["CLE", "LAL", "UTA"],"nbaId":203903},
+  {"id":81,"name":"Nic Claxton","team":"BKN","conf":"East","div":"Atlantic","pos":["C"],"ht":"6-11","htInches":83,"age":27,"jersey":"33","formerTeams":[],"nbaId":1629651},
+  {"id":82,"name":"Walter Clayton Jr.","team":"MEM","conf":"West","div":"Southwest","pos":["G"],"ht":"6-4","htInches":76,"age":23,"jersey":"4","formerTeams":[],"nbaId":1642383},
+  {"id":83,"name":"Nique Clifford","team":"SAC","conf":"West","div":"Pacific","pos":["G"],"ht":"6-5","htInches":77,"age":24,"jersey":"00","formerTeams":[],"nbaId":1642363},
+  {"id":84,"name":"Donovan Clingan","team":"POR","conf":"West","div":"Northwest","pos":["C"],"ht":"7-2","htInches":86,"age":22,"jersey":"23","formerTeams":[],"nbaId":1642270},
+  {"id":85,"name":"Noah Clowney","team":"BKN","conf":"East","div":"Atlantic","pos":["F", "C"],"ht":"6-10","htInches":82,"age":21,"jersey":"21","formerTeams":[],"nbaId":1641730},
+  {"id":86,"name":"Amir Coffey","team":"PHX","conf":"West","div":"Pacific","pos":["G", "F"],"ht":"6-7","htInches":79,"age":29,"jersey":"2","formerTeams":["LAC"],"nbaId":1629599},
+  {"id":87,"name":"Isaiah Collier","team":"UTA","conf":"West","div":"Northwest","pos":["G"],"ht":"6-4","htInches":76,"age":21,"jersey":"8","formerTeams":[],"nbaId":1642268},
+  {"id":88,"name":"John Collins","team":"LAC","conf":"West","div":"Pacific","pos":["F", "C"],"ht":"6-9","htInches":81,"age":28,"jersey":"20","formerTeams":["ATL", "UTA"],"nbaId":1628381},
+  {"id":89,"name":"Zach Collins","team":"CHI","conf":"East","div":"Central","pos":["F", "C"],"ht":"6-9","htInches":81,"age":28,"jersey":"12","formerTeams":["POR", "SAS"],"nbaId":1628380},
+  {"id":90,"name":"Mike Conley","team":"MIN","conf":"West","div":"Northwest","pos":["G"],"ht":"6-1","htInches":73,"age":38,"jersey":"10","formerTeams":["MEM", "UTA"],"nbaId":201144},
+  {"id":91,"name":"Pat Connaughton","team":"CHA","conf":"East","div":"Southeast","pos":["G"],"ht":"6-5","htInches":77,"age":33,"jersey":"21","formerTeams":["MIL", "POR"],"nbaId":1626192},
+  {"id":92,"name":"Sharife Cooper","team":"WAS","conf":"East","div":"Southeast","pos":["G"],"ht":"6-0","htInches":72,"age":25,"jersey":"13","formerTeams":["ATL"],"nbaId":1630536},
+  {"id":93,"name":"Bilal Coulibaly","team":"WAS","conf":"East","div":"Southeast","pos":["G"],"ht":"6-7","htInches":79,"age":21,"jersey":"0","formerTeams":[],"nbaId":1641731},
+  {"id":94,"name":"Cedric Coward","team":"MEM","conf":"West","div":"Southwest","pos":["G"],"ht":"6-5","htInches":77,"age":22,"jersey":"23","formerTeams":[],"nbaId":1642907},
+  {"id":95,"name":"Isaiah Crawford","team":"HOU","conf":"West","div":"Southwest","pos":["F"],"ht":"6-6","htInches":78,"age":24,"jersey":"27","formerTeams":["SAC"],"nbaId":1642384},
+  {"id":96,"name":"LJ Cryer","team":"GSW","conf":"West","div":"Pacific","pos":["G"],"ht":"6-0","htInches":72,"age":24,"jersey":"18","formerTeams":[],"nbaId":1643018},
+  {"id":97,"name":"Cade Cunningham","team":"DET","conf":"East","div":"Central","pos":["G"],"ht":"6-6","htInches":78,"age":24,"jersey":"2","formerTeams":[],"nbaId":1630595},
+  {"id":98,"name":"Seth Curry","team":"GSW","conf":"West","div":"Pacific","pos":["G"],"ht":"6-1","htInches":73,"age":35,"jersey":"31","formerTeams":["BKN", "CHA", "DAL", "PHI", "POR", "SAC"],"nbaId":203552},
+  {"id":99,"name":"Stephen Curry","team":"GSW","conf":"West","div":"Pacific","pos":["G"],"ht":"6-2","htInches":74,"age":38,"jersey":"30","formerTeams":[],"nbaId":201939},
+  {"id":100,"name":"Pac\u00f4me Dadiet","team":"NYK","conf":"East","div":"Atlantic","pos":["F"],"ht":"6-9","htInches":81,"age":20,"jersey":"4","formerTeams":[],"nbaId":1642359},
+  {"id":101,"name":"Dyson Daniels","team":"ATL","conf":"East","div":"Southeast","pos":["G"],"ht":"6-7","htInches":79,"age":23,"jersey":"5","formerTeams":["NOP"],"nbaId":1630700},
+  {"id":102,"name":"Anthony Davis","team":"WAS","conf":"East","div":"Southeast","pos":["F", "C"],"ht":"6-10","htInches":82,"age":33,"jersey":"23","formerTeams":["DAL", "LAL", "NOP"],"nbaId":203076},
+  {"id":103,"name":"JD Davison","team":"HOU","conf":"West","div":"Southwest","pos":["G"],"ht":"6-1","htInches":73,"age":23,"jersey":"4","formerTeams":["BOS"],"nbaId":1631120},
+  {"id":104,"name":"DeMar DeRozan","team":"SAC","conf":"West","div":"Pacific","pos":["G", "F"],"ht":"6-6","htInches":78,"age":36,"jersey":"10","formerTeams":["CHI", "SAS", "TOR"],"nbaId":201942},
+  {"id":105,"name":"RayJ Dennis","team":"ATL","conf":"East","div":"Southeast","pos":["G"],"ht":"6-1","htInches":73,"age":25,"jersey":"00","formerTeams":["IND"],"nbaId":1642484},
+  {"id":106,"name":"Donte DiVincenzo","team":"MIN","conf":"West","div":"Northwest","pos":["G"],"ht":"6-4","htInches":76,"age":29,"jersey":"0","formerTeams":["GSW", "MIL", "NYK", "SAC"],"nbaId":1628978},
+  {"id":107,"name":"Moussa Diabat\u00e9","team":"CHA","conf":"East","div":"Southeast","pos":["F"],"ht":"6-10","htInches":82,"age":24,"jersey":"14","formerTeams":["LAC"],"nbaId":1631217},
+  {"id":108,"name":"Mohamed Diawara","team":"NYK","conf":"East","div":"Atlantic","pos":["F"],"ht":"6-9","htInches":81,"age":21,"jersey":"51","formerTeams":[],"nbaId":1642885},
+  {"id":109,"name":"Gradey Dick","team":"TOR","conf":"East","div":"Atlantic","pos":["G", "F"],"ht":"6-7","htInches":79,"age":22,"jersey":"1","formerTeams":[],"nbaId":1641711},
+  {"id":110,"name":"Hunter Dickinson","team":"NOP","conf":"West","div":"Southwest","pos":["C"],"ht":"7-1","htInches":85,"age":25,"jersey":"4","formerTeams":[],"nbaId":1630621},
+  {"id":111,"name":"Ousmane Dieng","team":"MIL","conf":"East","div":"Central","pos":["F"],"ht":"6-9","htInches":81,"age":23,"jersey":"21","formerTeams":["OKC"],"nbaId":1631172},
+  {"id":112,"name":"Rob Dillingham","team":"CHI","conf":"East","div":"Central","pos":["G"],"ht":"6-2","htInches":74,"age":21,"jersey":"7","formerTeams":["MIN"],"nbaId":1642265},
+  {"id":113,"name":"Luka Don\u010di\u0107","team":"LAL","conf":"West","div":"Pacific","pos":["F", "G"],"ht":"6-8","htInches":80,"age":27,"jersey":"77","formerTeams":["DAL"],"nbaId":1629029},
+  {"id":114,"name":"Luguentz Dort","team":"OKC","conf":"West","div":"Northwest","pos":["G"],"ht":"6-4","htInches":76,"age":27,"jersey":"5","formerTeams":[],"nbaId":1629652},
+  {"id":115,"name":"Ayo Dosunmu","team":"MIN","conf":"West","div":"Northwest","pos":["G"],"ht":"6-4","htInches":76,"age":26,"jersey":"13","formerTeams":["CHI"],"nbaId":1630245},
+  {"id":116,"name":"Andre Drummond","team":"PHI","conf":"East","div":"Atlantic","pos":["C"],"ht":"6-11","htInches":83,"age":32,"jersey":"1","formerTeams":["BKN", "CHI", "CLE", "DET", "LAL"],"nbaId":203083},
+  {"id":117,"name":"Kris Dunn","team":"LAC","conf":"West","div":"Pacific","pos":["G"],"ht":"6-3","htInches":75,"age":32,"jersey":"8","formerTeams":["ATL", "CHI", "MIN", "POR", "UTA"],"nbaId":1627739},
+  {"id":118,"name":"Ryan Dunn","team":"PHX","conf":"West","div":"Pacific","pos":["F"],"ht":"6-7","htInches":79,"age":23,"jersey":"0","formerTeams":[],"nbaId":1642346},
+  {"id":119,"name":"Kevin Durant","team":"HOU","conf":"West","div":"Southwest","pos":["F"],"ht":"6-11","htInches":83,"age":37,"jersey":"7","formerTeams":["BKN", "GSW", "OKC", "PHX"],"nbaId":201142},
+  {"id":120,"name":"Jalen Duren","team":"DET","conf":"East","div":"Central","pos":["C"],"ht":"6-10","htInches":82,"age":22,"jersey":"0","formerTeams":[],"nbaId":1631105},
+  {"id":121,"name":"Egor D\u00ebmin","team":"BKN","conf":"East","div":"Atlantic","pos":["G"],"ht":"6-8","htInches":80,"age":20,"jersey":"8","formerTeams":[],"nbaId":1642856},
+  {"id":122,"name":"Tari Eason","team":"HOU","conf":"West","div":"Southwest","pos":["F"],"ht":"6-8","htInches":80,"age":25,"jersey":"17","formerTeams":[],"nbaId":1631106},
+  {"id":123,"name":"Zach Edey","team":"MEM","conf":"West","div":"Southwest","pos":["C"],"ht":"7-3","htInches":87,"age":24,"jersey":"14","formerTeams":[],"nbaId":1641744},
+  {"id":124,"name":"VJ Edgecombe","team":"PHI","conf":"East","div":"Atlantic","pos":["G"],"ht":"6-4","htInches":76,"age":20,"jersey":"77","formerTeams":[],"nbaId":1642845},
+  {"id":125,"name":"Anthony Edwards","team":"MIN","conf":"West","div":"Northwest","pos":["G"],"ht":"6-4","htInches":76,"age":24,"jersey":"5","formerTeams":[],"nbaId":1630162},
+  {"id":126,"name":"Justin Edwards","team":"PHI","conf":"East","div":"Atlantic","pos":["F"],"ht":"6-7","htInches":79,"age":22,"jersey":"11","formerTeams":[],"nbaId":1642348},
+  {"id":127,"name":"Keon Ellis","team":"CLE","conf":"East","div":"Central","pos":["G"],"ht":"6-4","htInches":76,"age":26,"jersey":"14","formerTeams":["SAC"],"nbaId":1631165},
+  {"id":128,"name":"Joel Embiid","team":"PHI","conf":"East","div":"Atlantic","pos":["C", "F"],"ht":"7-0","htInches":84,"age":32,"jersey":"21","formerTeams":[],"nbaId":203954},
+  {"id":129,"name":"Tristan Enaruna","team":"CLE","conf":"East","div":"Central","pos":["F"],"ht":"6-7","htInches":79,"age":25,"jersey":"21","formerTeams":[],"nbaId":1642400},
+  {"id":130,"name":"Noa Essengue","team":"CHI","conf":"East","div":"Central","pos":["F"],"ht":"6-8","htInches":80,"age":19,"jersey":"24","formerTeams":[],"nbaId":1642855},
+  {"id":131,"name":"Tyson Etienne","team":"BKN","conf":"East","div":"Atlantic","pos":["G"],"ht":"6-0","htInches":72,"age":26,"jersey":"10","formerTeams":[],"nbaId":1630623},
+  {"id":132,"name":"Drew Eubanks","team":"SAC","conf":"West","div":"Pacific","pos":["F", "C"],"ht":"6-10","htInches":82,"age":29,"jersey":"19","formerTeams":["LAC", "PHX", "POR", "SAS"],"nbaId":1629234},
+  {"id":133,"name":"Tosan Evbuomwan","team":"CHA","conf":"East","div":"Southeast","pos":["F"],"ht":"6-8","htInches":80,"age":25,"jersey":"20","formerTeams":["BKN", "DET"],"nbaId":1641787},
+  {"id":134,"name":"Jeremiah Fears","team":"NOP","conf":"West","div":"Southwest","pos":["G"],"ht":"6-3","htInches":75,"age":19,"jersey":"0","formerTeams":[],"nbaId":1642847},
+  {"id":135,"name":"Kyle Filipowski","team":"UTA","conf":"West","div":"Northwest","pos":["C"],"ht":"6-11","htInches":83,"age":22,"jersey":"2","formerTeams":[],"nbaId":1642271},
+  {"id":136,"name":"Dorian Finney-Smith","team":"HOU","conf":"West","div":"Southwest","pos":["F"],"ht":"6-7","htInches":79,"age":33,"jersey":"2","formerTeams":["BKN", "DAL", "LAL"],"nbaId":1627827},
+  {"id":137,"name":"Cooper Flagg","team":"DAL","conf":"West","div":"Southwest","pos":["F"],"ht":"6-9","htInches":81,"age":19,"jersey":"32","formerTeams":[],"nbaId":1642843},
+  {"id":138,"name":"Rasheer Fleming","team":"PHX","conf":"West","div":"Pacific","pos":["F"],"ht":"6-9","htInches":81,"age":21,"jersey":"20","formerTeams":[],"nbaId":1642853},
+  {"id":139,"name":"Simone Fontecchio","team":"MIA","conf":"East","div":"Southeast","pos":["F"],"ht":"6-7","htInches":79,"age":30,"jersey":"0","formerTeams":["DET", "UTA"],"nbaId":1631323},
+  {"id":140,"name":"De'Aaron Fox","team":"SAS","conf":"West","div":"Southwest","pos":["G"],"ht":"6-3","htInches":75,"age":28,"jersey":"4","formerTeams":["SAC"],"nbaId":1628368},
+  {"id":141,"name":"Enrique Freeman","team":"MIN","conf":"West","div":"Northwest","pos":["F"],"ht":"6-9","htInches":81,"age":25,"jersey":"25","formerTeams":["IND"],"nbaId":1642402},
+  {"id":142,"name":"Johnny Furphy","team":"IND","conf":"East","div":"Central","pos":["G"],"ht":"6-8","htInches":80,"age":21,"jersey":"12","formerTeams":[],"nbaId":1642277},
+  {"id":143,"name":"Daniel Gafford","team":"DAL","conf":"West","div":"Southwest","pos":["F", "C"],"ht":"6-10","htInches":82,"age":27,"jersey":"21","formerTeams":["CHI", "WAS"],"nbaId":1629655},
+  {"id":144,"name":"Myron Gardner","team":"MIA","conf":"East","div":"Southeast","pos":["F"],"ht":"6-5","htInches":77,"age":25,"jersey":"15","formerTeams":[],"nbaId":1642066},
+  {"id":145,"name":"Darius Garland","team":"LAC","conf":"West","div":"Pacific","pos":["G"],"ht":"6-1","htInches":73,"age":26,"jersey":"10","formerTeams":["CLE"],"nbaId":1629636},
+  {"id":146,"name":"Luka Garza","team":"BOS","conf":"East","div":"Atlantic","pos":["C"],"ht":"6-10","htInches":82,"age":27,"jersey":"52","formerTeams":["DET", "MIN"],"nbaId":1630568},
+  {"id":147,"name":"Keyonte George","team":"UTA","conf":"West","div":"Northwest","pos":["G"],"ht":"6-4","htInches":76,"age":22,"jersey":"3","formerTeams":[],"nbaId":1641718},
+  {"id":148,"name":"Kyshawn George","team":"WAS","conf":"East","div":"Southeast","pos":["F"],"ht":"6-8","htInches":80,"age":22,"jersey":"18","formerTeams":[],"nbaId":1642273},
+  {"id":149,"name":"Paul George","team":"PHI","conf":"East","div":"Atlantic","pos":["F"],"ht":"6-8","htInches":80,"age":36,"jersey":"8","formerTeams":["IND", "LAC", "OKC"],"nbaId":202331},
+  {"id":150,"name":"Taj Gibson","team":"MEM","conf":"West","div":"Southwest","pos":["F"],"ht":"6-9","htInches":81,"age":41,"jersey":"67","formerTeams":["CHA", "CHI", "DET", "MIN", "NYK", "OKC", "WAS"],"nbaId":201959},
+  {"id":151,"name":"Josh Giddey","team":"CHI","conf":"East","div":"Central","pos":["G"],"ht":"6-7","htInches":79,"age":23,"jersey":"3","formerTeams":["OKC"],"nbaId":1630581},
+  {"id":152,"name":"Keshon Gilbert","team":"ATL","conf":"East","div":"Southeast","pos":["G"],"ht":"6-4","htInches":76,"age":23,"jersey":"","formerTeams":[],"nbaId":1642933},
+  {"id":153,"name":"Shai Gilgeous-Alexander","team":"OKC","conf":"West","div":"Northwest","pos":["G"],"ht":"6-6","htInches":78,"age":27,"jersey":"2","formerTeams":["LAC"],"nbaId":1628983},
+  {"id":154,"name":"Anthony Gill","team":"WAS","conf":"East","div":"Southeast","pos":["F"],"ht":"6-7","htInches":79,"age":33,"jersey":"16","formerTeams":[],"nbaId":1630264},
+  {"id":155,"name":"Collin Gillespie","team":"PHX","conf":"West","div":"Pacific","pos":["G"],"ht":"6-1","htInches":73,"age":27,"jersey":"12","formerTeams":["DEN"],"nbaId":1631221},
+  {"id":156,"name":"Rudy Gobert","team":"MIN","conf":"West","div":"Northwest","pos":["C"],"ht":"7-1","htInches":85,"age":34,"jersey":"27","formerTeams":["UTA"],"nbaId":203497},
+  {"id":157,"name":"Vladislav Goldin","team":"MIA","conf":"East","div":"Southeast","pos":["C"],"ht":"7-0","htInches":84,"age":25,"jersey":"50","formerTeams":[],"nbaId":1642884},
+  {"id":158,"name":"Hugo Gonz\u00e1lez","team":"BOS","conf":"East","div":"Atlantic","pos":["G"],"ht":"6-6","htInches":78,"age":20,"jersey":"28","formerTeams":[],"nbaId":1642864},
+  {"id":159,"name":"Jordan Goodwin","team":"PHX","conf":"West","div":"Pacific","pos":["G"],"ht":"6-3","htInches":75,"age":27,"jersey":"23","formerTeams":["LAL", "MEM", "WAS"],"nbaId":1630692},
+  {"id":160,"name":"Aaron Gordon","team":"DEN","conf":"West","div":"Northwest","pos":["F"],"ht":"6-8","htInches":80,"age":30,"jersey":"32","formerTeams":["ORL"],"nbaId":203932},
+  {"id":161,"name":"Jerami Grant","team":"MEM","conf":"West","div":"Southwest","pos":["F"],"ht":"6-7","htInches":79,"age":32,"jersey":"9","formerTeams":["DEN", "DET", "OKC", "PHI", "POR"],"nbaId":203924},
+  {"id":162,"name":"Hayden Gray","team":"UTA","conf":"West","div":"Northwest","pos":["G"],"ht":"6-4","htInches":76,"age":23,"jersey":"","formerTeams":[],"nbaId":1643060},
+  {"id":163,"name":"AJ Green","team":"MIL","conf":"East","div":"Central","pos":["G"],"ht":"6-4","htInches":76,"age":26,"jersey":"20","formerTeams":[],"nbaId":1631260},
+  {"id":164,"name":"Draymond Green","team":"GSW","conf":"West","div":"Pacific","pos":["F"],"ht":"6-6","htInches":78,"age":36,"jersey":"23","formerTeams":[],"nbaId":203110},
+  {"id":165,"name":"Jalen Green","team":"PHX","conf":"West","div":"Pacific","pos":["G"],"ht":"6-4","htInches":76,"age":24,"jersey":"4","formerTeams":["HOU"],"nbaId":1630224},
+  {"id":166,"name":"Javonte Green","team":"DET","conf":"East","div":"Central","pos":["G"],"ht":"6-5","htInches":77,"age":32,"jersey":"31","formerTeams":["BOS", "CHI", "CLE"],"nbaId":1629750},
+  {"id":167,"name":"Jeff Green","team":"HOU","conf":"West","div":"Southwest","pos":["F"],"ht":"6-8","htInches":80,"age":39,"jersey":"32","formerTeams":["BKN", "CLE", "DEN", "LAC", "ORL", "WAS"],"nbaId":201145},
+  {"id":168,"name":"Josh Green","team":"CHA","conf":"East","div":"Southeast","pos":["G"],"ht":"6-6","htInches":78,"age":25,"jersey":"10","formerTeams":["DAL"],"nbaId":1630182},
+  {"id":169,"name":"Quentin Grimes","team":"PHI","conf":"East","div":"Atlantic","pos":["G"],"ht":"6-5","htInches":77,"age":26,"jersey":"5","formerTeams":["DET", "NYK"],"nbaId":1629656},
+  {"id":170,"name":"Mouhamadou Gueye","team":"CHI","conf":"East","div":"Central","pos":["F"],"ht":"6-9","htInches":81,"age":27,"jersey":"16","formerTeams":["TOR"],"nbaId":1631338},
+  {"id":171,"name":"Mouhamed Gueye","team":"ATL","conf":"East","div":"Southeast","pos":["F"],"ht":"6-11","htInches":83,"age":23,"jersey":"18","formerTeams":[],"nbaId":1631243},
+  {"id":172,"name":"Rui Hachimura","team":"LAL","conf":"West","div":"Pacific","pos":["F"],"ht":"6-8","htInches":80,"age":28,"jersey":"28","formerTeams":["WAS"],"nbaId":1629060},
+  {"id":173,"name":"PJ Hall","team":"CHA","conf":"East","div":"Southeast","pos":["C"],"ht":"6-8","htInches":80,"age":24,"jersey":"16","formerTeams":["DEN"],"nbaId":1641790},
+  {"id":174,"name":"Tim Hardaway Jr.","team":"DEN","conf":"West","div":"Northwest","pos":["G", "F"],"ht":"6-5","htInches":77,"age":34,"jersey":"10","formerTeams":["ATL", "DAL", "DET", "NYK"],"nbaId":203501},
+  {"id":175,"name":"James Harden","team":"CLE","conf":"East","div":"Central","pos":["G"],"ht":"6-5","htInches":77,"age":36,"jersey":"1","formerTeams":["BKN", "HOU", "LAC", "PHI"],"nbaId":201935},
+  {"id":176,"name":"Jaden Hardy","team":"WAS","conf":"East","div":"Southeast","pos":["G"],"ht":"6-3","htInches":75,"age":23,"jersey":"8","formerTeams":["DAL"],"nbaId":1630702},
+  {"id":177,"name":"Elijah Harkless","team":"UTA","conf":"West","div":"Northwest","pos":["G"],"ht":"6-3","htInches":75,"age":26,"jersey":"16","formerTeams":[],"nbaId":1641989},
+  {"id":178,"name":"Dylan Harper","team":"SAS","conf":"West","div":"Southwest","pos":["G"],"ht":"6-5","htInches":77,"age":20,"jersey":"2","formerTeams":[],"nbaId":1642844},
+  {"id":179,"name":"Ron Harper Jr.","team":"BOS","conf":"East","div":"Atlantic","pos":["G", "F"],"ht":"6-5","htInches":77,"age":26,"jersey":"13","formerTeams":["DET", "TOR"],"nbaId":1631199},
+  {"id":180,"name":"Gary Harris","team":"MIL","conf":"East","div":"Central","pos":["G"],"ht":"6-4","htInches":76,"age":31,"jersey":"11","formerTeams":["DEN", "ORL"],"nbaId":203914},
+  {"id":181,"name":"Tobias Harris","team":"DET","conf":"East","div":"Central","pos":["F"],"ht":"6-8","htInches":80,"age":33,"jersey":"12","formerTeams":["LAC", "PHI"],"nbaId":202699},
+  {"id":182,"name":"Josh Hart","team":"NYK","conf":"East","div":"Atlantic","pos":["G"],"ht":"6-5","htInches":77,"age":31,"jersey":"3","formerTeams":["LAL", "NOP", "POR"],"nbaId":1628404},
+  {"id":183,"name":"Isaiah Hartenstein","team":"OKC","conf":"West","div":"Northwest","pos":["C", "F"],"ht":"7-0","htInches":84,"age":28,"jersey":"55","formerTeams":["CLE", "HOU", "LAC", "NYK"],"nbaId":1628392},
+  {"id":184,"name":"Sam Hauser","team":"BOS","conf":"East","div":"Atlantic","pos":["F"],"ht":"6-7","htInches":79,"age":28,"jersey":"30","formerTeams":[],"nbaId":1630573},
+  {"id":185,"name":"Jordan Hawkins","team":"NOP","conf":"West","div":"Southwest","pos":["G"],"ht":"6-5","htInches":77,"age":24,"jersey":"24","formerTeams":[],"nbaId":1641722},
+  {"id":186,"name":"Jaxson Hayes","team":"LAL","conf":"West","div":"Pacific","pos":["C", "F"],"ht":"7-0","htInches":84,"age":26,"jersey":"11","formerTeams":["NOP"],"nbaId":1629637},
+  {"id":187,"name":"Killian Hayes","team":"SAC","conf":"West","div":"Pacific","pos":["G"],"ht":"6-4","htInches":76,"age":24,"jersey":"7","formerTeams":["BKN", "DET"],"nbaId":1630165},
+  {"id":188,"name":"Scoot Henderson","team":"POR","conf":"West","div":"Northwest","pos":["G"],"ht":"6-3","htInches":75,"age":22,"jersey":"00","formerTeams":[],"nbaId":1630703},
+  {"id":189,"name":"Taylor Hendricks","team":"MEM","conf":"West","div":"Southwest","pos":["F"],"ht":"6-9","htInches":81,"age":22,"jersey":"22","formerTeams":["UTA"],"nbaId":1641707},
+  {"id":190,"name":"Chucky Hepburn","team":"TOR","conf":"East","div":"Atlantic","pos":["G"],"ht":"6-0","htInches":72,"age":23,"jersey":"24","formerTeams":[],"nbaId":1642935},
+  {"id":191,"name":"Tyler Herro","team":"MIA","conf":"East","div":"Southeast","pos":["G"],"ht":"6-5","htInches":77,"age":26,"jersey":"14","formerTeams":[],"nbaId":1629639},
+  {"id":192,"name":"Buddy Hield","team":"ATL","conf":"East","div":"Southeast","pos":["G"],"ht":"6-4","htInches":76,"age":33,"jersey":"8","formerTeams":["GSW", "IND", "PHI", "SAC"],"nbaId":1627741},
+  {"id":193,"name":"Haywood Highsmith","team":"PHX","conf":"West","div":"Pacific","pos":["F"],"ht":"6-5","htInches":77,"age":29,"jersey":"7","formerTeams":["MIA", "PHI"],"nbaId":1629312},
+  {"id":194,"name":"Blake Hinson","team":"UTA","conf":"West","div":"Northwest","pos":["F"],"ht":"6-8","htInches":80,"age":26,"jersey":"2","formerTeams":[],"nbaId":1642396},
+  {"id":195,"name":"Aaron Holiday","team":"HOU","conf":"West","div":"Southwest","pos":["G"],"ht":"6-0","htInches":72,"age":29,"jersey":"0","formerTeams":["ATL", "IND", "PHX"],"nbaId":1628988},
+  {"id":196,"name":"Jrue Holiday","team":"POR","conf":"West","div":"Northwest","pos":["G"],"ht":"6-4","htInches":76,"age":36,"jersey":"5","formerTeams":["BOS", "MIL", "NOP"],"nbaId":201950},
+  {"id":197,"name":"Ronald Holland II","team":"DET","conf":"East","div":"Central","pos":["F"],"ht":"6-8","htInches":80,"age":20,"jersey":"5","formerTeams":[],"nbaId":1641842},
+  {"id":198,"name":"DaRon Holmes II","team":"DEN","conf":"West","div":"Northwest","pos":["F"],"ht":"6-9","htInches":81,"age":23,"jersey":"14","formerTeams":[],"nbaId":1641747},
+  {"id":199,"name":"Chet Holmgren","team":"OKC","conf":"West","div":"Northwest","pos":["C", "F"],"ht":"7-1","htInches":85,"age":24,"jersey":"7","formerTeams":[],"nbaId":1631096},
+  {"id":200,"name":"Al Horford","team":"GSW","conf":"West","div":"Pacific","pos":["C", "F"],"ht":"6-8","htInches":80,"age":40,"jersey":"20","formerTeams":["ATL", "BOS", "PHI"],"nbaId":201143},
+  {"id":201,"name":"Jett Howard","team":"ORL","conf":"East","div":"Southeast","pos":["G"],"ht":"6-8","htInches":80,"age":22,"jersey":"13","formerTeams":[],"nbaId":1641724},
+  {"id":202,"name":"Kevin Huerter","team":"DET","conf":"East","div":"Central","pos":["G", "F"],"ht":"6-6","htInches":78,"age":27,"jersey":"27","formerTeams":["ATL", "CHI", "SAC"],"nbaId":1628989},
+  {"id":203,"name":"Jay Huff","team":"IND","conf":"East","div":"Central","pos":["C"],"ht":"7-1","htInches":85,"age":28,"jersey":"32","formerTeams":["DEN", "LAL", "MEM", "WAS"],"nbaId":1630643},
+  {"id":204,"name":"Ariel Hukporti","team":"NYK","conf":"East","div":"Atlantic","pos":["C"],"ht":"7-0","htInches":84,"age":24,"jersey":"55","formerTeams":[],"nbaId":1630574},
+  {"id":205,"name":"De'Andre Hunter","team":"SAC","conf":"West","div":"Pacific","pos":["F", "G"],"ht":"6-7","htInches":79,"age":28,"jersey":"15","formerTeams":["ATL", "CLE"],"nbaId":1629631},
+  {"id":206,"name":"CJ Huntley","team":"PHX","conf":"West","div":"Pacific","pos":["F"],"ht":"6-11","htInches":83,"age":24,"jersey":"22","formerTeams":[],"nbaId":1643047},
+  {"id":207,"name":"Bones Hyland","team":"MIN","conf":"West","div":"Northwest","pos":["G"],"ht":"6-2","htInches":74,"age":25,"jersey":"8","formerTeams":["DEN", "LAC"],"nbaId":1630538},
+  {"id":208,"name":"Oso Ighodaro","team":"PHX","conf":"West","div":"Pacific","pos":["F"],"ht":"6-11","htInches":83,"age":23,"jersey":"11","formerTeams":[],"nbaId":1642345},
+  {"id":209,"name":"Joe Ingles","team":"MIN","conf":"West","div":"Northwest","pos":["F", "G"],"ht":"6-8","htInches":80,"age":38,"jersey":"7","formerTeams":["MIL", "ORL", "POR", "UTA"],"nbaId":204060},
+  {"id":210,"name":"Brandon Ingram","team":"TOR","conf":"East","div":"Atlantic","pos":["F"],"ht":"6-8","htInches":80,"age":28,"jersey":"3","formerTeams":["LAL", "NOP"],"nbaId":1627742},
+  {"id":211,"name":"Harrison Ingram","team":"SAS","conf":"West","div":"Southwest","pos":["F"],"ht":"6-5","htInches":77,"age":23,"jersey":"55","formerTeams":[],"nbaId":1631127},
+  {"id":212,"name":"Jonathan Isaac","team":"ORL","conf":"East","div":"Southeast","pos":["F"],"ht":"6-10","htInches":82,"age":28,"jersey":"1","formerTeams":[],"nbaId":1628371},
+  {"id":213,"name":"GG Jackson","team":"MEM","conf":"West","div":"Southwest","pos":["F"],"ht":"6-9","htInches":81,"age":21,"jersey":"45","formerTeams":[],"nbaId":1641713},
+  {"id":214,"name":"Isaiah Jackson","team":"LAC","conf":"West","div":"Pacific","pos":["F"],"ht":"6-8","htInches":80,"age":24,"jersey":"23","formerTeams":["IND"],"nbaId":1630543},
+  {"id":215,"name":"Quenton Jackson","team":"IND","conf":"East","div":"Central","pos":["G"],"ht":"6-4","htInches":76,"age":27,"jersey":"29","formerTeams":["WAS"],"nbaId":1631245},
+  {"id":216,"name":"Andre Jackson Jr.","team":"MIL","conf":"East","div":"Central","pos":["G"],"ht":"6-6","htInches":78,"age":24,"jersey":"44","formerTeams":[],"nbaId":1641748},
+  {"id":217,"name":"Jaren Jackson Jr.","team":"UTA","conf":"West","div":"Northwest","pos":["F", "C"],"ht":"6-10","htInches":82,"age":26,"jersey":"20","formerTeams":["MEM"],"nbaId":1628991},
+  {"id":218,"name":"Trayce Jackson-Davis","team":"TOR","conf":"East","div":"Atlantic","pos":["F"],"ht":"6-9","htInches":81,"age":26,"jersey":"32","formerTeams":["GSW"],"nbaId":1631218},
+  {"id":219,"name":"Kasparas Jaku\u010dionis","team":"MIA","conf":"East","div":"Southeast","pos":["G"],"ht":"6-5","htInches":77,"age":20,"jersey":"25","formerTeams":[],"nbaId":1642857},
+  {"id":220,"name":"Bronny James","team":"LAL","conf":"West","div":"Pacific","pos":["G"],"ht":"6-2","htInches":74,"age":21,"jersey":"9","formerTeams":[],"nbaId":1642355},
+  {"id":221,"name":"LeBron James","team":"LAL","conf":"West","div":"Pacific","pos":["F"],"ht":"6-9","htInches":81,"age":41,"jersey":"23","formerTeams":["CLE"],"nbaId":2544},
+  {"id":222,"name":"Sion James","team":"CHA","conf":"East","div":"Southeast","pos":["G"],"ht":"6-5","htInches":77,"age":23,"jersey":"4","formerTeams":[],"nbaId":1642883},
+  {"id":223,"name":"Jaime Jaquez Jr.","team":"MIA","conf":"East","div":"Southeast","pos":["G"],"ht":"6-6","htInches":78,"age":25,"jersey":"11","formerTeams":[],"nbaId":1631170},
+  {"id":224,"name":"Trey Jemison III","team":"NYK","conf":"East","div":"Atlantic","pos":["C"],"ht":"6-10","htInches":82,"age":26,"jersey":"50","formerTeams":["LAL", "MEM"],"nbaId":1641998},
+  {"id":225,"name":"Daniss Jenkins","team":"DET","conf":"East","div":"Central","pos":["G"],"ht":"6-4","htInches":76,"age":24,"jersey":"24","formerTeams":[],"nbaId":1642450},
+  {"id":226,"name":"Ty Jerome","team":"MEM","conf":"West","div":"Southwest","pos":["G", "F"],"ht":"6-5","htInches":77,"age":28,"jersey":"2","formerTeams":["CLE", "GSW", "OKC", "PHX"],"nbaId":1629660},
+  {"id":227,"name":"Isaiah Joe","team":"OKC","conf":"West","div":"Northwest","pos":["G"],"ht":"6-4","htInches":76,"age":27,"jersey":"11","formerTeams":["PHI"],"nbaId":1630198},
+  {"id":228,"name":"AJ Johnson","team":"DAL","conf":"West","div":"Southwest","pos":["G"],"ht":"6-5","htInches":77,"age":21,"jersey":"8","formerTeams":["WAS"],"nbaId":1642358},
+  {"id":229,"name":"Cameron Johnson","team":"DEN","conf":"West","div":"Northwest","pos":["F"],"ht":"6-8","htInches":80,"age":30,"jersey":"23","formerTeams":["BKN", "PHX"],"nbaId":1629661},
+  {"id":230,"name":"Chaney Johnson","team":"BKN","conf":"East","div":"Atlantic","pos":["G", "F"],"ht":"6-7","htInches":79,"age":24,"jersey":"31","formerTeams":[],"nbaId":1643052},
+  {"id":231,"name":"Jalen Johnson","team":"ATL","conf":"East","div":"Southeast","pos":["F"],"ht":"6-8","htInches":80,"age":24,"jersey":"1","formerTeams":[],"nbaId":1630552},
+  {"id":232,"name":"Keldon Johnson","team":"SAS","conf":"West","div":"Southwest","pos":["F", "G"],"ht":"6-6","htInches":78,"age":26,"jersey":"3","formerTeams":[],"nbaId":1629640},
+  {"id":233,"name":"Keshad Johnson","team":"MIA","conf":"East","div":"Southeast","pos":["F"],"ht":"6-6","htInches":78,"age":25,"jersey":"16","formerTeams":[],"nbaId":1642352},
+  {"id":234,"name":"Tre Johnson","team":"WAS","conf":"East","div":"Southeast","pos":["G"],"ht":"6-5","htInches":77,"age":20,"jersey":"12","formerTeams":[],"nbaId":1642848},
+  {"id":235,"name":"Nikola Joki\u0107","team":"DEN","conf":"West","div":"Northwest","pos":["C"],"ht":"6-11","htInches":83,"age":31,"jersey":"15","formerTeams":[],"nbaId":203999},
+  {"id":236,"name":"Curtis Jones","team":"DEN","conf":"West","div":"Northwest","pos":["G"],"ht":"6-3","htInches":75,"age":24,"jersey":"1","formerTeams":[],"nbaId":1642938},
+  {"id":237,"name":"Dillon Jones","team":"NYK","conf":"East","div":"Atlantic","pos":["F"],"ht":"6-5","htInches":77,"age":24,"jersey":"","formerTeams":["OKC"],"nbaId":1641794},
+  {"id":238,"name":"Herbert Jones","team":"NOP","conf":"West","div":"Southwest","pos":["F"],"ht":"6-7","htInches":79,"age":27,"jersey":"2","formerTeams":[],"nbaId":1630529},
+  {"id":239,"name":"Isaac Jones","team":"DET","conf":"East","div":"Central","pos":["F"],"ht":"6-8","htInches":80,"age":25,"jersey":"3","formerTeams":["SAC"],"nbaId":1642403},
+  {"id":240,"name":"Kam Jones","team":"IND","conf":"East","div":"Central","pos":["G"],"ht":"6-4","htInches":76,"age":24,"jersey":"7","formerTeams":[],"nbaId":1642880},
+  {"id":241,"name":"Spencer Jones","team":"DEN","conf":"West","div":"Northwest","pos":["F"],"ht":"6-7","htInches":79,"age":25,"jersey":"21","formerTeams":[],"nbaId":1642461},
+  {"id":242,"name":"Tre Jones","team":"CHI","conf":"East","div":"Central","pos":["G"],"ht":"6-1","htInches":73,"age":26,"jersey":"30","formerTeams":["SAS"],"nbaId":1630200},
+  {"id":243,"name":"Tyus Jones","team":"DEN","conf":"West","div":"Northwest","pos":["G"],"ht":"6-0","htInches":72,"age":30,"jersey":"5","formerTeams":["MEM", "MIN", "PHX", "WAS"],"nbaId":1626145},
+  {"id":244,"name":"David Jones Garcia","team":"SAS","conf":"West","div":"Southwest","pos":["G"],"ht":"6-4","htInches":76,"age":24,"jersey":"25","formerTeams":[],"nbaId":1642357},
+  {"id":245,"name":"Derrick Jones Jr.","team":"LAC","conf":"West","div":"Pacific","pos":["F"],"ht":"6-6","htInches":78,"age":29,"jersey":"5","formerTeams":["CHI", "DAL", "MIA", "PHX", "POR"],"nbaId":1627884},
+  {"id":246,"name":"DeAndre Jordan","team":"NOP","conf":"West","div":"Southwest","pos":["C"],"ht":"6-11","htInches":83,"age":37,"jersey":"9","formerTeams":["BKN", "DEN", "LAC", "NYK", "PHI"],"nbaId":201599},
+  {"id":247,"name":"Nikola Jovi\u0107","team":"MIA","conf":"East","div":"Southeast","pos":["F"],"ht":"6-10","htInches":82,"age":23,"jersey":"5","formerTeams":[],"nbaId":1631107},
+  {"id":248,"name":"Ryan Kalkbrenner","team":"CHA","conf":"East","div":"Southeast","pos":["C"],"ht":"7-1","htInches":85,"age":24,"jersey":"11","formerTeams":[],"nbaId":1641750},
+  {"id":249,"name":"Yuki Kawamura","team":"CHI","conf":"East","div":"Central","pos":["G"],"ht":"5-7","htInches":67,"age":25,"jersey":"8","formerTeams":["MEM"],"nbaId":1642530},
+  {"id":250,"name":"Trevor Keels","team":"MIA","conf":"East","div":"Southeast","pos":["G"],"ht":"6-3","htInches":75,"age":22,"jersey":"3","formerTeams":["NYK"],"nbaId":1631211},
+  {"id":251,"name":"Luke Kennard","team":"LAL","conf":"West","div":"Pacific","pos":["G"],"ht":"6-5","htInches":77,"age":30,"jersey":"10","formerTeams":["DET", "LAC", "MEM"],"nbaId":1628379},
+  {"id":252,"name":"Jayson Kent","team":"POR","conf":"West","div":"Northwest","pos":["F"],"ht":"6-8","htInches":80,"age":24,"jersey":"","formerTeams":[],"nbaId":1643257},
+  {"id":253,"name":"Walker Kessler","team":"UTA","conf":"West","div":"Northwest","pos":["C"],"ht":"7-2","htInches":86,"age":24,"jersey":"24","formerTeams":[],"nbaId":1631117},
+  {"id":254,"name":"Corey Kispert","team":"ATL","conf":"East","div":"Southeast","pos":["F"],"ht":"6-6","htInches":78,"age":27,"jersey":"24","formerTeams":["WAS"],"nbaId":1630557},
+  {"id":255,"name":"Maxi Kleber","team":"LAL","conf":"West","div":"Pacific","pos":["F"],"ht":"6-10","htInches":82,"age":34,"jersey":"14","formerTeams":["DAL"],"nbaId":1628467},
+  {"id":256,"name":"Dalton Knecht","team":"LAL","conf":"West","div":"Pacific","pos":["F"],"ht":"6-6","htInches":78,"age":25,"jersey":"4","formerTeams":[],"nbaId":1642261},
+  {"id":257,"name":"Kon Knueppel","team":"CHA","conf":"East","div":"Southeast","pos":["G", "F"],"ht":"6-6","htInches":78,"age":20,"jersey":"7","formerTeams":[],"nbaId":1642851},
+  {"id":258,"name":"Tyler Kolek","team":"NYK","conf":"East","div":"Atlantic","pos":["G"],"ht":"6-2","htInches":74,"age":25,"jersey":"13","formerTeams":[],"nbaId":1642278},
+  {"id":259,"name":"Christian Koloko","team":"ATL","conf":"East","div":"Southeast","pos":["C"],"ht":"6-11","htInches":83,"age":26,"jersey":"10","formerTeams":["LAL", "TOR"],"nbaId":1631132},
+  {"id":260,"name":"John Konchar","team":"UTA","conf":"West","div":"Northwest","pos":["G"],"ht":"6-5","htInches":77,"age":30,"jersey":"55","formerTeams":["MEM"],"nbaId":1629723},
+  {"id":261,"name":"Luke Kornet","team":"SAS","conf":"West","div":"Southwest","pos":["C", "F"],"ht":"7-1","htInches":85,"age":30,"jersey":"7","formerTeams":["BOS", "CHI", "NYK"],"nbaId":1628436},
+  {"id":262,"name":"V\u00edt Krej\u010d\u00ed","team":"POR","conf":"West","div":"Northwest","pos":["G"],"ht":"6-8","htInches":80,"age":26,"jersey":"27","formerTeams":["ATL", "OKC"],"nbaId":1630249},
+  {"id":263,"name":"Jonathan Kuminga","team":"ATL","conf":"East","div":"Southeast","pos":["F"],"ht":"6-7","htInches":79,"age":23,"jersey":"0","formerTeams":["GSW"],"nbaId":1630228},
+  {"id":264,"name":"Kyle Kuzma","team":"MIL","conf":"East","div":"Central","pos":["F"],"ht":"6-8","htInches":80,"age":30,"jersey":"18","formerTeams":["LAL", "WAS"],"nbaId":1628398},
+  {"id":265,"name":"Jake LaRavia","team":"LAL","conf":"West","div":"Pacific","pos":["F"],"ht":"6-7","htInches":79,"age":24,"jersey":"12","formerTeams":["MEM", "SAC"],"nbaId":1631222},
+  {"id":266,"name":"Zach LaVine","team":"SAC","conf":"West","div":"Pacific","pos":["G"],"ht":"6-5","htInches":77,"age":31,"jersey":"8","formerTeams":["CHI", "MIN"],"nbaId":203897},
+  {"id":267,"name":"Jock Landale","team":"ATL","conf":"East","div":"Southeast","pos":["C"],"ht":"6-11","htInches":83,"age":30,"jersey":"31","formerTeams":["HOU", "PHX", "SAS"],"nbaId":1629111},
+  {"id":268,"name":"Chaz Lanier","team":"DET","conf":"East","div":"Central","pos":["G"],"ht":"6-3","htInches":75,"age":24,"jersey":"20","formerTeams":[],"nbaId":1642404},
+  {"id":269,"name":"Pelle Larsson","team":"MIA","conf":"East","div":"Southeast","pos":["G"],"ht":"6-5","htInches":77,"age":25,"jersey":"9","formerTeams":[],"nbaId":1641796},
+  {"id":270,"name":"A.J. Lawson","team":"TOR","conf":"East","div":"Atlantic","pos":["G"],"ht":"6-6","htInches":78,"age":25,"jersey":"0","formerTeams":["DAL"],"nbaId":1630639},
+  {"id":271,"name":"Caris LeVert","team":"DET","conf":"East","div":"Central","pos":["G"],"ht":"6-7","htInches":79,"age":31,"jersey":"8","formerTeams":["ATL", "BKN", "CLE", "IND"],"nbaId":1627747},
+  {"id":272,"name":"Kawhi Leonard","team":"LAC","conf":"West","div":"Pacific","pos":["F"],"ht":"6-6","htInches":78,"age":35,"jersey":"2","formerTeams":["SAS", "TOR"],"nbaId":202695},
+  {"id":273,"name":"Malevy Leons","team":"GSW","conf":"West","div":"Pacific","pos":["F"],"ht":"6-9","htInches":81,"age":26,"jersey":"33","formerTeams":["OKC"],"nbaId":1642502},
+  {"id":274,"name":"E.J. Liddell","team":"BKN","conf":"East","div":"Atlantic","pos":["F"],"ht":"6-6","htInches":78,"age":25,"jersey":"9","formerTeams":["CHI", "NOP"],"nbaId":1630604},
+  {"id":275,"name":"Dereck Lively II","team":"DAL","conf":"West","div":"Southwest","pos":["C"],"ht":"7-1","htInches":85,"age":22,"jersey":"2","formerTeams":[],"nbaId":1641726},
+  {"id":276,"name":"Isaiah Livers","team":"PHX","conf":"West","div":"Pacific","pos":["F"],"ht":"6-6","htInches":78,"age":27,"jersey":"18","formerTeams":["DET"],"nbaId":1630587},
+  {"id":277,"name":"Kevon Looney","team":"NOP","conf":"West","div":"Southwest","pos":["F"],"ht":"6-9","htInches":81,"age":30,"jersey":"55","formerTeams":["GSW"],"nbaId":1626172},
+  {"id":278,"name":"Brook Lopez","team":"LAC","conf":"West","div":"Pacific","pos":["C"],"ht":"7-1","htInches":85,"age":38,"jersey":"11","formerTeams":["BKN", "LAL", "MIL"],"nbaId":201572},
+  {"id":279,"name":"Caleb Love","team":"POR","conf":"West","div":"Northwest","pos":["G"],"ht":"6-3","htInches":75,"age":24,"jersey":"2","formerTeams":[],"nbaId":1631126},
+  {"id":280,"name":"Kevin Love","team":"UTA","conf":"West","div":"Northwest","pos":["F", "C"],"ht":"6-10","htInches":82,"age":37,"jersey":"42","formerTeams":["CLE", "MIA"],"nbaId":201567},
+  {"id":281,"name":"Kyle Lowry","team":"PHI","conf":"East","div":"Atlantic","pos":["G"],"ht":"6-0","htInches":72,"age":40,"jersey":"7","formerTeams":["MIA", "TOR"],"nbaId":200768},
+  {"id":282,"name":"Khaman Maluach","team":"PHX","conf":"West","div":"Pacific","pos":["C"],"ht":"7-1","htInches":85,"age":19,"jersey":"10","formerTeams":[],"nbaId":1642863},
+  {"id":283,"name":"Sandro Mamukelashvili","team":"TOR","conf":"East","div":"Atlantic","pos":["F", "C"],"ht":"6-9","htInches":81,"age":27,"jersey":"54","formerTeams":["MIL", "SAS"],"nbaId":1630572},
+  {"id":284,"name":"Terance Mann","team":"BKN","conf":"East","div":"Atlantic","pos":["G", "F"],"ht":"6-6","htInches":78,"age":29,"jersey":"14","formerTeams":["ATL", "LAC"],"nbaId":1629611},
+  {"id":285,"name":"Tre Mann","team":"CHA","conf":"East","div":"Southeast","pos":["G"],"ht":"6-4","htInches":76,"age":25,"jersey":"23","formerTeams":["OKC"],"nbaId":1630544},
+  {"id":286,"name":"Lauri Markkanen","team":"UTA","conf":"West","div":"Northwest","pos":["F", "C"],"ht":"7-1","htInches":85,"age":29,"jersey":"23","formerTeams":["CHI", "CLE"],"nbaId":1628374},
+  {"id":287,"name":"Naji Marshall","team":"DAL","conf":"West","div":"Southwest","pos":["F"],"ht":"6-6","htInches":78,"age":28,"jersey":"3","formerTeams":["NOP"],"nbaId":1630230},
+  {"id":288,"name":"Alijah Martin","team":"TOR","conf":"East","div":"Atlantic","pos":["G"],"ht":"6-2","htInches":74,"age":24,"jersey":"55","formerTeams":[],"nbaId":1642918},
+  {"id":289,"name":"Caleb Martin","team":"DAL","conf":"West","div":"Southwest","pos":["F"],"ht":"6-5","htInches":77,"age":30,"jersey":"16","formerTeams":["CHA", "MIA"],"nbaId":1628997},
+  {"id":290,"name":"Tyrese Martin","team":"PHI","conf":"East","div":"Atlantic","pos":["F"],"ht":"6-6","htInches":78,"age":27,"jersey":"23","formerTeams":["ATL", "BKN"],"nbaId":1631213},
+  {"id":291,"name":"Jahmai Mashack","team":"MEM","conf":"West","div":"Southwest","pos":["G"],"ht":"6-4","htInches":76,"age":23,"jersey":"","formerTeams":[],"nbaId":1642942},
+  {"id":292,"name":"Bennedict Mathurin","team":"LAC","conf":"West","div":"Pacific","pos":["G", "F"],"ht":"6-5","htInches":77,"age":24,"jersey":"9","formerTeams":["IND"],"nbaId":1631097},
+  {"id":293,"name":"Karlo Matkovi\u0107","team":"NOP","conf":"West","div":"Southwest","pos":["F", "C"],"ht":"6-10","htInches":82,"age":25,"jersey":"17","formerTeams":[],"nbaId":1631255},
+  {"id":294,"name":"Tyrese Maxey","team":"PHI","conf":"East","div":"Atlantic","pos":["G"],"ht":"6-2","htInches":74,"age":25,"jersey":"0","formerTeams":[],"nbaId":1630178},
+  {"id":295,"name":"Chris Ma\u00f1on","team":"LAL","conf":"West","div":"Pacific","pos":["G"],"ht":"6-4","htInches":76,"age":24,"jersey":"30","formerTeams":[],"nbaId":1643024},
+  {"id":296,"name":"Bez Mbeng","team":"UTA","conf":"West","div":"Northwest","pos":["G"],"ht":"6-4","htInches":76,"age":23,"jersey":"21","formerTeams":[],"nbaId":1643016},
+  {"id":297,"name":"Miles McBride","team":"NYK","conf":"East","div":"Atlantic","pos":["G"],"ht":"6-2","htInches":74,"age":25,"jersey":"2","formerTeams":[],"nbaId":1630540},
+  {"id":298,"name":"Jared McCain","team":"OKC","conf":"West","div":"Northwest","pos":["G"],"ht":"6-3","htInches":75,"age":22,"jersey":"3","formerTeams":["PHI"],"nbaId":1642272},
+  {"id":299,"name":"Mac McClung","team":"CHI","conf":"East","div":"Central","pos":["G"],"ht":"6-2","htInches":74,"age":27,"jersey":"5","formerTeams":["LAL", "ORL", "PHI"],"nbaId":1630644},
+  {"id":300,"name":"CJ McCollum","team":"ATL","conf":"East","div":"Southeast","pos":["G"],"ht":"6-3","htInches":75,"age":34,"jersey":"3","formerTeams":["NOP", "POR"],"nbaId":203468},
+  {"id":301,"name":"T.J. McConnell","team":"IND","conf":"East","div":"Central","pos":["G"],"ht":"6-1","htInches":73,"age":34,"jersey":"9","formerTeams":["PHI"],"nbaId":204456},
+  {"id":302,"name":"Kevin McCullar Jr.","team":"NYK","conf":"East","div":"Atlantic","pos":["G"],"ht":"6-6","htInches":78,"age":25,"jersey":"9","formerTeams":[],"nbaId":1641755},
+  {"id":303,"name":"Jaden McDaniels","team":"MIN","conf":"West","div":"Northwest","pos":["F"],"ht":"6-9","htInches":81,"age":25,"jersey":"3","formerTeams":[],"nbaId":1630183},
+  {"id":304,"name":"Doug McDermott","team":"SAC","conf":"West","div":"Pacific","pos":["F"],"ht":"6-7","htInches":79,"age":34,"jersey":"7","formerTeams":["CHI", "DAL", "IND", "OKC", "SAS"],"nbaId":203926},
+  {"id":305,"name":"Bryce McGowens","team":"NOP","conf":"West","div":"Southwest","pos":["G"],"ht":"6-6","htInches":78,"age":23,"jersey":"11","formerTeams":["CHA", "POR"],"nbaId":1631121},
+  {"id":306,"name":"Jordan McLaughlin","team":"SAS","conf":"West","div":"Southwest","pos":["G"],"ht":"5-11","htInches":71,"age":30,"jersey":"0","formerTeams":["MIN"],"nbaId":1629162},
+  {"id":307,"name":"Liam McNeeley","team":"CHA","conf":"East","div":"Southeast","pos":["F"],"ht":"6-7","htInches":79,"age":20,"jersey":"33","formerTeams":[],"nbaId":1642862},
+  {"id":308,"name":"De'Anthony Melton","team":"GSW","conf":"West","div":"Pacific","pos":["G"],"ht":"6-2","htInches":74,"age":28,"jersey":"8","formerTeams":["BKN", "MEM", "PHI", "PHX"],"nbaId":1629001},
+  {"id":309,"name":"Sam Merrill","team":"CLE","conf":"East","div":"Central","pos":["G"],"ht":"6-4","htInches":76,"age":30,"jersey":"5","formerTeams":["MEM", "MIL"],"nbaId":1630241},
+  {"id":310,"name":"Khris Middleton","team":"DAL","conf":"West","div":"Southwest","pos":["F"],"ht":"6-7","htInches":79,"age":34,"jersey":"20","formerTeams":["MIL", "WAS"],"nbaId":203114},
+  {"id":311,"name":"Brandon Miller","team":"CHA","conf":"East","div":"Southeast","pos":["F"],"ht":"6-7","htInches":79,"age":23,"jersey":"24","formerTeams":[],"nbaId":1641706},
+  {"id":312,"name":"Emanuel Miller","team":"SAS","conf":"West","div":"Southwest","pos":["F"],"ht":"6-5","htInches":77,"age":26,"jersey":"14","formerTeams":["CHI"],"nbaId":1641801},
+  {"id":313,"name":"Jordan Miller","team":"LAC","conf":"West","div":"Pacific","pos":["G"],"ht":"6-5","htInches":77,"age":26,"jersey":"22","formerTeams":[],"nbaId":1641757},
+  {"id":314,"name":"Leonard Miller","team":"CHI","conf":"East","div":"Central","pos":["F"],"ht":"6-10","htInches":82,"age":22,"jersey":"11","formerTeams":["MIN"],"nbaId":1631159},
+  {"id":315,"name":"Riley Minix","team":"CLE","conf":"East","div":"Central","pos":["F"],"ht":"6-7","htInches":79,"age":25,"jersey":"12","formerTeams":["SAS"],"nbaId":1642434},
+  {"id":316,"name":"Josh Minott","team":"BKN","conf":"East","div":"Atlantic","pos":["F"],"ht":"6-8","htInches":80,"age":23,"jersey":"00","formerTeams":["MIN"],"nbaId":1631169},
+  {"id":317,"name":"Yves Missi","team":"NOP","conf":"West","div":"Southwest","pos":["C"],"ht":"6-11","htInches":83,"age":22,"jersey":"21","formerTeams":[],"nbaId":1642274},
+  {"id":318,"name":"Ajay Mitchell","team":"OKC","conf":"West","div":"Northwest","pos":["G"],"ht":"6-4","htInches":76,"age":24,"jersey":"25","formerTeams":[],"nbaId":1642349},
+  {"id":319,"name":"Davion Mitchell","team":"MIA","conf":"East","div":"Southeast","pos":["G"],"ht":"6-0","htInches":72,"age":27,"jersey":"2","formerTeams":["SAC"],"nbaId":1630558},
+  {"id":320,"name":"Donovan Mitchell","team":"CLE","conf":"East","div":"Central","pos":["G"],"ht":"6-2","htInches":74,"age":29,"jersey":"45","formerTeams":["UTA"],"nbaId":1628378},
+  {"id":321,"name":"Evan Mobley","team":"CLE","conf":"East","div":"Central","pos":["C"],"ht":"6-11","htInches":83,"age":25,"jersey":"4","formerTeams":[],"nbaId":1630596},
+  {"id":322,"name":"Jonathan Mogbo","team":"SAC","conf":"West","div":"Pacific","pos":["F"],"ht":"6-9","htInches":81,"age":24,"jersey":"2","formerTeams":["TOR"],"nbaId":1642367},
+  {"id":323,"name":"Malik Monk","team":"SAC","conf":"West","div":"Pacific","pos":["G"],"ht":"6-3","htInches":75,"age":28,"jersey":"0","formerTeams":["CHA", "LAL"],"nbaId":1628370},
+  {"id":324,"name":"Moses Moody","team":"GSW","conf":"West","div":"Pacific","pos":["G"],"ht":"6-5","htInches":77,"age":24,"jersey":"4","formerTeams":[],"nbaId":1630541},
+  {"id":325,"name":"Wendell Moore Jr.","team":"DET","conf":"East","div":"Central","pos":["G"],"ht":"6-5","htInches":77,"age":24,"jersey":"14","formerTeams":["CHA", "MIN"],"nbaId":1631111},
+  {"id":326,"name":"Alex Morales","team":"ORL","conf":"East","div":"Southeast","pos":["G"],"ht":"6-6","htInches":78,"age":28,"jersey":"","formerTeams":[],"nbaId":1631457},
+  {"id":327,"name":"Ja Morant","team":"POR","conf":"West","div":"Northwest","pos":["G"],"ht":"6-2","htInches":74,"age":26,"jersey":"12","formerTeams":["MEM"],"nbaId":1629630},
+  {"id":328,"name":"Trey Murphy III","team":"NOP","conf":"West","div":"Southwest","pos":["F"],"ht":"6-8","htInches":80,"age":26,"jersey":"25","formerTeams":[],"nbaId":1630530},
+  {"id":329,"name":"Dejounte Murray","team":"NOP","conf":"West","div":"Southwest","pos":["G"],"ht":"6-4","htInches":76,"age":29,"jersey":"5","formerTeams":["ATL", "SAS"],"nbaId":1627749},
+  {"id":330,"name":"Jamal Murray","team":"DEN","conf":"West","div":"Northwest","pos":["G"],"ht":"6-4","htInches":76,"age":29,"jersey":"27","formerTeams":[],"nbaId":1627750},
+  {"id":331,"name":"Keegan Murray","team":"SAC","conf":"West","div":"Pacific","pos":["F"],"ht":"6-8","htInches":80,"age":25,"jersey":"13","formerTeams":[],"nbaId":1631099},
+  {"id":332,"name":"Kris Murray","team":"MEM","conf":"West","div":"Southwest","pos":["F"],"ht":"6-8","htInches":80,"age":25,"jersey":"24","formerTeams":["POR"],"nbaId":1631200},
+  {"id":333,"name":"Collin Murray-Boyles","team":"TOR","conf":"East","div":"Atlantic","pos":["F"],"ht":"6-7","htInches":79,"age":21,"jersey":"30","formerTeams":[],"nbaId":1642867},
+  {"id":334,"name":"Svi Mykhailiuk","team":"UTA","conf":"West","div":"Northwest","pos":["G", "F"],"ht":"6-7","htInches":79,"age":29,"jersey":"10","formerTeams":["BOS", "CHA", "DET", "OKC", "TOR"],"nbaId":1629004},
+  {"id":335,"name":"Pete Nance","team":"MIL","conf":"East","div":"Central","pos":["F"],"ht":"6-9","htInches":81,"age":26,"jersey":"35","formerTeams":["CLE"],"nbaId":1631250},
+  {"id":336,"name":"Larry Nance Jr.","team":"CLE","conf":"East","div":"Central","pos":["F", "C"],"ht":"6-6","htInches":78,"age":33,"jersey":"22","formerTeams":["ATL", "LAL", "NOP"],"nbaId":1626204},
+  {"id":337,"name":"Andrew Nembhard","team":"IND","conf":"East","div":"Central","pos":["G", "F"],"ht":"6-4","htInches":76,"age":26,"jersey":"2","formerTeams":[],"nbaId":1629614},
+  {"id":338,"name":"Ryan Nembhard","team":"DAL","conf":"West","div":"Southwest","pos":["G"],"ht":"5-11","htInches":71,"age":23,"jersey":"9","formerTeams":[],"nbaId":1642948},
+  {"id":339,"name":"Aaron Nesmith","team":"IND","conf":"East","div":"Central","pos":["G", "F"],"ht":"6-5","htInches":77,"age":26,"jersey":"23","formerTeams":["BOS"],"nbaId":1630174},
+  {"id":340,"name":"Asa Newell","team":"ATL","conf":"East","div":"Southeast","pos":["F"],"ht":"6-10","htInches":82,"age":20,"jersey":"14","formerTeams":[],"nbaId":1642854},
+  {"id":341,"name":"Tristen Newton","team":"HOU","conf":"West","div":"Southwest","pos":["G"],"ht":"6-5","htInches":77,"age":25,"jersey":"13","formerTeams":["MIN"],"nbaId":1641803},
+  {"id":342,"name":"Yanic Konan Niederh\u00e4user","team":"LAC","conf":"West","div":"Pacific","pos":["C"],"ht":"6-11","htInches":83,"age":23,"jersey":"14","formerTeams":[],"nbaId":1642949},
+  {"id":343,"name":"Zeke Nnaji","team":"DEN","conf":"West","div":"Northwest","pos":["F", "C"],"ht":"6-10","htInches":82,"age":25,"jersey":"22","formerTeams":[],"nbaId":1630192},
+  {"id":344,"name":"Jusuf Nurki\u0107","team":"UTA","conf":"West","div":"Northwest","pos":["C"],"ht":"6-11","htInches":83,"age":31,"jersey":"30","formerTeams":["CHA", "DEN", "PHX", "POR"],"nbaId":203994},
+  {"id":345,"name":"Royce O'Neale","team":"PHX","conf":"West","div":"Pacific","pos":["F"],"ht":"6-6","htInches":78,"age":33,"jersey":"00","formerTeams":["BKN", "UTA"],"nbaId":1626220},
+  {"id":346,"name":"Josh Oduro","team":"NOP","conf":"West","div":"Southwest","pos":["C"],"ht":"6-9","htInches":81,"age":25,"jersey":"","formerTeams":[],"nbaId":1642490},
+  {"id":347,"name":"Josh Okogie","team":"HOU","conf":"West","div":"Southwest","pos":["G"],"ht":"6-4","htInches":76,"age":27,"jersey":"20","formerTeams":["CHA", "MIN", "PHX"],"nbaId":1629006},
+  {"id":348,"name":"Onyeka Okongwu","team":"ATL","conf":"East","div":"Southeast","pos":["F", "C"],"ht":"6-10","htInches":82,"age":25,"jersey":"17","formerTeams":[],"nbaId":1630168},
+  {"id":349,"name":"Isaac Okoro","team":"CHI","conf":"East","div":"Central","pos":["F", "G"],"ht":"6-4","htInches":76,"age":25,"jersey":"35","formerTeams":["CLE"],"nbaId":1630171},
+  {"id":350,"name":"Lachlan Olbrich","team":"CHI","conf":"East","div":"Central","pos":["C"],"ht":"6-8","htInches":80,"age":22,"jersey":"47","formerTeams":[],"nbaId":1642950},
+  {"id":351,"name":"Kelly Olynyk","team":"SAS","conf":"West","div":"Southwest","pos":["F", "C"],"ht":"7-0","htInches":84,"age":35,"jersey":"8","formerTeams":["BOS", "DET", "HOU", "MIA", "NOP", "TOR", "UTA"],"nbaId":203482},
+  {"id":352,"name":"Norchad Omier","team":"LAC","conf":"West","div":"Pacific","pos":["F"],"ht":"6-7","htInches":79,"age":24,"jersey":"","formerTeams":[],"nbaId":1641807},
+  {"id":353,"name":"Kelly Oubre Jr.","team":"PHI","conf":"East","div":"Atlantic","pos":["F", "G"],"ht":"6-8","htInches":80,"age":30,"jersey":"9","formerTeams":["CHA", "GSW", "PHX", "WAS"],"nbaId":1626162},
+  {"id":354,"name":"Gary Payton II","team":"GSW","conf":"West","div":"Pacific","pos":["G"],"ht":"6-2","htInches":74,"age":33,"jersey":"0","formerTeams":["LAL", "MIL", "WAS"],"nbaId":1627780},
+  {"id":355,"name":"Micah Peavy","team":"NOP","conf":"West","div":"Southwest","pos":["G", "F"],"ht":"6-7","htInches":79,"age":24,"jersey":"14","formerTeams":[],"nbaId":1642877},
+  {"id":356,"name":"Sean Pedulla","team":"LAC","conf":"West","div":"Pacific","pos":["G"],"ht":"6-1","htInches":73,"age":23,"jersey":"","formerTeams":[],"nbaId":1642951},
+  {"id":357,"name":"Noah Penda","team":"ORL","conf":"East","div":"Southeast","pos":["G", "F"],"ht":"6-7","htInches":79,"age":21,"jersey":"93","formerTeams":[],"nbaId":1642869},
+  {"id":358,"name":"Taelon Peter","team":"IND","conf":"East","div":"Central","pos":["G"],"ht":"6-3","htInches":75,"age":24,"jersey":"4","formerTeams":[],"nbaId":1643007},
+  {"id":359,"name":"Julian Phillips","team":"MIN","conf":"West","div":"Northwest","pos":["F"],"ht":"6-6","htInches":78,"age":22,"jersey":"4","formerTeams":["CHI"],"nbaId":1641763},
+  {"id":360,"name":"Jalen Pickett","team":"DEN","conf":"West","div":"Northwest","pos":["G"],"ht":"6-2","htInches":74,"age":26,"jersey":"24","formerTeams":[],"nbaId":1629618},
+  {"id":361,"name":"Scotty Pippen Jr.","team":"MEM","conf":"West","div":"Southwest","pos":["G"],"ht":"6-2","htInches":74,"age":25,"jersey":"1","formerTeams":["LAL"],"nbaId":1630590},
+  {"id":362,"name":"Daeqwon Plowden","team":"SAC","conf":"West","div":"Pacific","pos":["G", "F"],"ht":"6-4","htInches":76,"age":27,"jersey":"29","formerTeams":["ATL"],"nbaId":1631342},
+  {"id":363,"name":"Mason Plumlee","team":"SAS","conf":"West","div":"Southwest","pos":["F", "C"],"ht":"7-0","htInches":84,"age":36,"jersey":"45","formerTeams":["CHA", "DEN", "DET", "LAC", "PHX", "POR"],"nbaId":203486},
+  {"id":364,"name":"Brandin Podziemski","team":"GSW","conf":"West","div":"Pacific","pos":["G"],"ht":"6-4","htInches":76,"age":23,"jersey":"2","formerTeams":[],"nbaId":1641764},
+  {"id":365,"name":"Jakob Poeltl","team":"TOR","conf":"East","div":"Atlantic","pos":["C"],"ht":"7-0","htInches":84,"age":30,"jersey":"19","formerTeams":["SAS"],"nbaId":1627751},
+  {"id":366,"name":"Jordan Poole","team":"NOP","conf":"West","div":"Southwest","pos":["G"],"ht":"6-4","htInches":76,"age":27,"jersey":"3","formerTeams":["GSW", "WAS"],"nbaId":1629673},
+  {"id":367,"name":"Craig Porter Jr.","team":"CLE","conf":"East","div":"Central","pos":["G"],"ht":"6-1","htInches":73,"age":26,"jersey":"9","formerTeams":[],"nbaId":1641854},
+  {"id":368,"name":"Kevin Porter Jr.","team":"MIL","conf":"East","div":"Central","pos":["G", "F"],"ht":"6-5","htInches":77,"age":26,"jersey":"7","formerTeams":["CLE", "HOU"],"nbaId":1629645},
+  {"id":369,"name":"Michael Porter Jr.","team":"BKN","conf":"East","div":"Atlantic","pos":["F"],"ht":"6-10","htInches":82,"age":28,"jersey":"17","formerTeams":["DEN"],"nbaId":1629008},
+  {"id":370,"name":"Bobby Portis","team":"MIL","conf":"East","div":"Central","pos":["F"],"ht":"6-9","htInches":81,"age":31,"jersey":"9","formerTeams":["CHI", "NYK", "WAS"],"nbaId":1626171},
+  {"id":371,"name":"Kristaps Porzi\u0146\u0123is","team":"GSW","conf":"West","div":"Pacific","pos":["F", "C"],"ht":"7-2","htInches":86,"age":30,"jersey":"7","formerTeams":["BOS", "DAL", "NYK", "WAS"],"nbaId":204001},
+  {"id":372,"name":"Quinten Post","team":"GSW","conf":"West","div":"Pacific","pos":["C"],"ht":"7-0","htInches":84,"age":26,"jersey":"21","formerTeams":[],"nbaId":1642366},
+  {"id":373,"name":"Micah Potter","team":"IND","conf":"East","div":"Central","pos":["C"],"ht":"6-9","htInches":81,"age":28,"jersey":"11","formerTeams":["DET", "UTA"],"nbaId":1630695},
+  {"id":374,"name":"John Poulakidas","team":"DAL","conf":"West","div":"Southwest","pos":["G"],"ht":"6-6","htInches":78,"age":23,"jersey":"","formerTeams":[],"nbaId":1642967},
+  {"id":375,"name":"Drake Powell","team":"BKN","conf":"East","div":"Atlantic","pos":["G", "F"],"ht":"6-5","htInches":77,"age":20,"jersey":"4","formerTeams":[],"nbaId":1642962},
+  {"id":376,"name":"Dwight Powell","team":"DAL","conf":"West","div":"Southwest","pos":["F", "C"],"ht":"6-10","htInches":82,"age":34,"jersey":"7","formerTeams":[],"nbaId":203939},
+  {"id":377,"name":"Norman Powell","team":"MIA","conf":"East","div":"Southeast","pos":["G"],"ht":"6-3","htInches":75,"age":33,"jersey":"24","formerTeams":["LAC", "POR", "TOR"],"nbaId":1626181},
+  {"id":378,"name":"Taurean Prince","team":"MIL","conf":"East","div":"Central","pos":["F"],"ht":"6-6","htInches":78,"age":32,"jersey":"12","formerTeams":["ATL", "BKN", "CLE", "LAL", "MIN"],"nbaId":1627752},
+  {"id":379,"name":"Payton Pritchard","team":"BOS","conf":"East","div":"Atlantic","pos":["G"],"ht":"6-1","htInches":73,"age":28,"jersey":"11","formerTeams":[],"nbaId":1630202},
+  {"id":380,"name":"Tyrese Proctor","team":"CLE","conf":"East","div":"Central","pos":["G"],"ht":"6-4","htInches":76,"age":22,"jersey":"24","formerTeams":[],"nbaId":1642878},
+  {"id":381,"name":"Olivier-Maxence Prosper","team":"MEM","conf":"West","div":"Southwest","pos":["F"],"ht":"6-7","htInches":79,"age":24,"jersey":"18","formerTeams":["DAL"],"nbaId":1641765},
+  {"id":382,"name":"Zyon Pullin","team":"MIN","conf":"West","div":"Northwest","pos":["G"],"ht":"6-4","htInches":76,"age":25,"jersey":"15","formerTeams":["MEM"],"nbaId":1642389},
+  {"id":383,"name":"Derik Queen","team":"NOP","conf":"West","div":"Southwest","pos":["C"],"ht":"6-9","htInches":81,"age":21,"jersey":"22","formerTeams":[],"nbaId":1642852},
+  {"id":384,"name":"Neemias Queta","team":"BOS","conf":"East","div":"Atlantic","pos":["C"],"ht":"7-0","htInches":84,"age":26,"jersey":"88","formerTeams":["SAC"],"nbaId":1629674},
+  {"id":385,"name":"Immanuel Quickley","team":"TOR","conf":"East","div":"Atlantic","pos":["G"],"ht":"6-2","htInches":74,"age":27,"jersey":"5","formerTeams":["NYK"],"nbaId":1630193},
+  {"id":386,"name":"Julius Randle","team":"MIN","conf":"West","div":"Northwest","pos":["F", "C"],"ht":"6-9","htInches":81,"age":31,"jersey":"30","formerTeams":["LAL", "NOP", "NYK"],"nbaId":203944},
+  {"id":387,"name":"Maxime Raynaud","team":"SAC","conf":"West","div":"Pacific","pos":["C"],"ht":"7-1","htInches":85,"age":23,"jersey":"42","formerTeams":[],"nbaId":1642875},
+  {"id":388,"name":"Austin Reaves","team":"LAL","conf":"West","div":"Pacific","pos":["G"],"ht":"6-5","htInches":77,"age":28,"jersey":"15","formerTeams":[],"nbaId":1630559},
+  {"id":389,"name":"Paul Reed","team":"DET","conf":"East","div":"Central","pos":["F"],"ht":"6-9","htInches":81,"age":27,"jersey":"7","formerTeams":["PHI"],"nbaId":1630194},
+  {"id":390,"name":"Julian Reese","team":"WAS","conf":"East","div":"Southeast","pos":["F"],"ht":"6-9","htInches":81,"age":23,"jersey":"","formerTeams":[],"nbaId":1642882},
+  {"id":391,"name":"Antonio Reeves","team":"CHA","conf":"East","div":"Southeast","pos":["G"],"ht":"6-5","htInches":77,"age":25,"jersey":"12","formerTeams":["NOP"],"nbaId":1641810},
+  {"id":392,"name":"Naz Reid","team":"MIN","conf":"West","div":"Northwest","pos":["C", "F"],"ht":"6-9","htInches":81,"age":26,"jersey":"11","formerTeams":[],"nbaId":1629675},
+  {"id":393,"name":"Will Richard","team":"GSW","conf":"West","div":"Pacific","pos":["G"],"ht":"6-3","htInches":75,"age":23,"jersey":"3","formerTeams":[],"nbaId":1642954},
+  {"id":394,"name":"Nick Richards","team":"CHI","conf":"East","div":"Central","pos":["C"],"ht":"6-11","htInches":83,"age":28,"jersey":"13","formerTeams":["CHA", "PHX"],"nbaId":1630208},
+  {"id":395,"name":"Jase Richardson","team":"ORL","conf":"East","div":"Southeast","pos":["G"],"ht":"6-1","htInches":73,"age":20,"jersey":"11","formerTeams":[],"nbaId":1642859},
+  {"id":396,"name":"Will Riley","team":"WAS","conf":"East","div":"Southeast","pos":["F"],"ht":"6-9","htInches":81,"age":20,"jersey":"27","formerTeams":[],"nbaId":1642860},
+  {"id":397,"name":"Zaccharie Risacher","team":"ATL","conf":"East","div":"Southeast","pos":["F"],"ht":"6-8","htInches":80,"age":21,"jersey":"10","formerTeams":[],"nbaId":1642258},
+  {"id":398,"name":"Duncan Robinson","team":"DET","conf":"East","div":"Central","pos":["F"],"ht":"6-7","htInches":79,"age":32,"jersey":"55","formerTeams":["MIA"],"nbaId":1629130},
+  {"id":399,"name":"Mitchell Robinson","team":"NYK","conf":"East","div":"Atlantic","pos":["C", "F"],"ht":"7-0","htInches":84,"age":28,"jersey":"23","formerTeams":[],"nbaId":1629011},
+  {"id":400,"name":"David Roddy","team":"DEN","conf":"West","div":"Northwest","pos":["F"],"ht":"6-5","htInches":77,"age":25,"jersey":"45","formerTeams":["HOU", "MEM", "PHX"],"nbaId":1631223},
+  {"id":401,"name":"Ryan Rollins","team":"MIL","conf":"East","div":"Central","pos":["G"],"ht":"6-3","htInches":75,"age":24,"jersey":"13","formerTeams":["GSW"],"nbaId":1631157},
+  {"id":402,"name":"Rayan Rupert","team":"MEM","conf":"West","div":"Southwest","pos":["G", "F"],"ht":"6-7","htInches":79,"age":22,"jersey":"21","formerTeams":["POR"],"nbaId":1641712},
+  {"id":403,"name":"D'Angelo Russell","team":"WAS","conf":"East","div":"Southeast","pos":["G"],"ht":"6-3","htInches":75,"age":30,"jersey":"5","formerTeams":["BKN", "LAL", "MIN"],"nbaId":1626156},
+  {"id":404,"name":"Cormac Ryan","team":"MIL","conf":"East","div":"Central","pos":["G"],"ht":"6-5","htInches":77,"age":27,"jersey":"30","formerTeams":[],"nbaId":1642504},
+  {"id":405,"name":"Domantas Sabonis","team":"SAC","conf":"West","div":"Pacific","pos":["F", "C"],"ht":"6-10","htInches":82,"age":30,"jersey":"11","formerTeams":["IND", "OKC"],"nbaId":1627734},
+  {"id":406,"name":"Tidjane Sala\u00fcn","team":"CHA","conf":"East","div":"Southeast","pos":["F"],"ht":"6-10","htInches":82,"age":20,"jersey":"31","formerTeams":[],"nbaId":1642275},
+  {"id":407,"name":"Kobe Sanders","team":"LAC","conf":"West","div":"Pacific","pos":["G"],"ht":"6-8","htInches":80,"age":24,"jersey":"4","formerTeams":[],"nbaId":1642920},
+  {"id":408,"name":"Payton Sandfort","team":"OKC","conf":"West","div":"Northwest","pos":["F"],"ht":"6-7","htInches":79,"age":23,"jersey":"14","formerTeams":[],"nbaId":1642362},
+  {"id":409,"name":"Gui Santos","team":"GSW","conf":"West","div":"Pacific","pos":["F"],"ht":"6-7","htInches":79,"age":24,"jersey":"15","formerTeams":[],"nbaId":1630611},
+  {"id":410,"name":"Ben Saraf","team":"BKN","conf":"East","div":"Atlantic","pos":["G"],"ht":"6-6","htInches":78,"age":20,"jersey":"77","formerTeams":[],"nbaId":1642879},
+  {"id":411,"name":"Alex Sarr","team":"WAS","conf":"East","div":"Southeast","pos":["C"],"ht":"7-0","htInches":84,"age":21,"jersey":"20","formerTeams":[],"nbaId":1642259},
+  {"id":412,"name":"Olivier Sarr","team":"CLE","conf":"East","div":"Central","pos":["C"],"ht":"6-10","htInches":82,"age":27,"jersey":"33","formerTeams":["OKC"],"nbaId":1630846},
+  {"id":413,"name":"Marcus Sasser","team":"DET","conf":"East","div":"Central","pos":["G"],"ht":"6-1","htInches":73,"age":25,"jersey":"25","formerTeams":[],"nbaId":1631204},
+  {"id":414,"name":"Baylor Scheierman","team":"BOS","conf":"East","div":"Atlantic","pos":["G"],"ht":"6-6","htInches":78,"age":25,"jersey":"55","formerTeams":[],"nbaId":1631248},
+  {"id":415,"name":"Dennis Schr\u00f6der","team":"CLE","conf":"East","div":"Central","pos":["G"],"ht":"6-1","htInches":73,"age":32,"jersey":"8","formerTeams":["ATL", "BKN", "DET", "HOU", "LAL", "OKC"],"nbaId":203471},
+  {"id":416,"name":"Alperen Sengun","team":"HOU","conf":"West","div":"Southwest","pos":["C"],"ht":"6-11","htInches":83,"age":23,"jersey":"28","formerTeams":[],"nbaId":1630578},
+  {"id":417,"name":"Brice Sensabaugh","team":"UTA","conf":"West","div":"Northwest","pos":["F"],"ht":"6-6","htInches":78,"age":22,"jersey":"28","formerTeams":[],"nbaId":1641729},
+  {"id":418,"name":"Collin Sexton","team":"CHI","conf":"East","div":"Central","pos":["G"],"ht":"6-3","htInches":75,"age":27,"jersey":"2","formerTeams":["CLE", "UTA"],"nbaId":1629012},
+  {"id":419,"name":"Landry Shamet","team":"NYK","conf":"East","div":"Atlantic","pos":["G"],"ht":"6-5","htInches":77,"age":29,"jersey":"44","formerTeams":["BKN", "LAC", "PHX", "WAS"],"nbaId":1629013},
+  {"id":420,"name":"Terrence Shannon Jr.","team":"MIN","conf":"West","div":"Northwest","pos":["G", "F"],"ht":"6-6","htInches":78,"age":25,"jersey":"1","formerTeams":[],"nbaId":1630545},
+  {"id":421,"name":"Day'Ron Sharpe","team":"BKN","conf":"East","div":"Atlantic","pos":["C"],"ht":"6-10","htInches":82,"age":24,"jersey":"20","formerTeams":[],"nbaId":1630549},
+  {"id":422,"name":"Shaedon Sharpe","team":"POR","conf":"West","div":"Northwest","pos":["G"],"ht":"6-5","htInches":77,"age":23,"jersey":"17","formerTeams":[],"nbaId":1631101},
+  {"id":423,"name":"Jamal Shead","team":"TOR","conf":"East","div":"Atlantic","pos":["G"],"ht":"6-1","htInches":73,"age":23,"jersey":"23","formerTeams":[],"nbaId":1642347},
+  {"id":424,"name":"Ben Sheppard","team":"IND","conf":"East","div":"Central","pos":["G"],"ht":"6-6","htInches":78,"age":24,"jersey":"26","formerTeams":[],"nbaId":1641767},
+  {"id":425,"name":"Reed Sheppard","team":"HOU","conf":"West","div":"Southwest","pos":["G"],"ht":"6-2","htInches":74,"age":22,"jersey":"15","formerTeams":[],"nbaId":1642263},
+  {"id":426,"name":"Max Shulga","team":"BOS","conf":"East","div":"Atlantic","pos":["G"],"ht":"6-4","htInches":76,"age":24,"jersey":"44","formerTeams":[],"nbaId":1642917},
+  {"id":427,"name":"Pascal Siakam","team":"IND","conf":"East","div":"Central","pos":["F"],"ht":"6-8","htInches":80,"age":32,"jersey":"43","formerTeams":["TOR"],"nbaId":1627783},
+  {"id":428,"name":"Anfernee Simons","team":"CHI","conf":"East","div":"Central","pos":["G"],"ht":"6-3","htInches":75,"age":27,"jersey":"22","formerTeams":["POR"],"nbaId":1629014},
+  {"id":429,"name":"KJ Simpson","team":"DEN","conf":"West","div":"Northwest","pos":["G"],"ht":"6-2","htInches":74,"age":23,"jersey":"25","formerTeams":["CHA"],"nbaId":1642354},
+  {"id":430,"name":"Jericho Sims","team":"MIL","conf":"East","div":"Central","pos":["C"],"ht":"6-10","htInches":82,"age":27,"jersey":"00","formerTeams":["NYK"],"nbaId":1630579},
+  {"id":431,"name":"Jalen Slawson","team":"IND","conf":"East","div":"Central","pos":["F"],"ht":"6-7","htInches":79,"age":26,"jersey":"18","formerTeams":["SAC"],"nbaId":1641771},
+  {"id":432,"name":"Javon Small","team":"MEM","conf":"West","div":"Southwest","pos":["G"],"ht":"6-1","htInches":73,"age":23,"jersey":"10","formerTeams":[],"nbaId":1642914},
+  {"id":433,"name":"Marcus Smart","team":"LAL","conf":"West","div":"Pacific","pos":["G"],"ht":"6-3","htInches":75,"age":32,"jersey":"36","formerTeams":["BOS", "MEM", "WAS"],"nbaId":203935},
+  {"id":434,"name":"Dru Smith","team":"MIA","conf":"East","div":"Southeast","pos":["G"],"ht":"6-2","htInches":74,"age":28,"jersey":"12","formerTeams":["BKN"],"nbaId":1630696},
+  {"id":435,"name":"Jalen Smith","team":"CHI","conf":"East","div":"Central","pos":["F", "C"],"ht":"6-8","htInches":80,"age":26,"jersey":"25","formerTeams":["IND", "PHX"],"nbaId":1630188},
+  {"id":436,"name":"Malachi Smith","team":"BKN","conf":"East","div":"Atlantic","pos":["G"],"ht":"6-4","htInches":76,"age":26,"jersey":"18","formerTeams":[],"nbaId":1641869},
+  {"id":437,"name":"Tolu Smith","team":"DET","conf":"East","div":"Central","pos":["F"],"ht":"6-11","htInches":83,"age":25,"jersey":"35","formerTeams":[],"nbaId":1642449},
+  {"id":438,"name":"Tyler Smith","team":"DAL","conf":"West","div":"Southwest","pos":["F"],"ht":"6-9","htInches":81,"age":21,"jersey":"21","formerTeams":["MIL"],"nbaId":1641890},
+  {"id":439,"name":"Jabari Smith Jr.","team":"HOU","conf":"West","div":"Southwest","pos":["F"],"ht":"6-11","htInches":83,"age":23,"jersey":"10","formerTeams":[],"nbaId":1631095},
+  {"id":440,"name":"Nick Smith Jr.","team":"LAL","conf":"West","div":"Pacific","pos":["G"],"ht":"6-2","htInches":74,"age":22,"jersey":"20","formerTeams":["CHA"],"nbaId":1641733},
+  {"id":441,"name":"Jeremy Sochan","team":"NYK","conf":"East","div":"Atlantic","pos":["F"],"ht":"6-8","htInches":80,"age":23,"jersey":"20","formerTeams":["SAS"],"nbaId":1631110},
+  {"id":442,"name":"Cam Spencer","team":"MEM","conf":"West","div":"Southwest","pos":["G"],"ht":"6-3","htInches":75,"age":26,"jersey":"24","formerTeams":[],"nbaId":1642285},
+  {"id":443,"name":"Pat Spencer","team":"GSW","conf":"West","div":"Pacific","pos":["G"],"ht":"6-2","htInches":74,"age":29,"jersey":"61","formerTeams":[],"nbaId":1630311},
+  {"id":444,"name":"Isaiah Stevens","team":"SAC","conf":"West","div":"Pacific","pos":["G"],"ht":"5-11","htInches":71,"age":25,"jersey":"24","formerTeams":["MIA"],"nbaId":1641815},
+  {"id":445,"name":"Isaiah Stewart","team":"DET","conf":"East","div":"Central","pos":["F", "C"],"ht":"6-8","htInches":80,"age":25,"jersey":"28","formerTeams":[],"nbaId":1630191},
+  {"id":446,"name":"Julian Strawther","team":"DEN","conf":"West","div":"Northwest","pos":["G"],"ht":"6-6","htInches":78,"age":24,"jersey":"3","formerTeams":[],"nbaId":1631124},
+  {"id":447,"name":"Max Strus","team":"CLE","conf":"East","div":"Central","pos":["G", "F"],"ht":"6-5","htInches":77,"age":30,"jersey":"2","formerTeams":["CHI", "MIA"],"nbaId":1629622},
+  {"id":448,"name":"Jalen Suggs","team":"ORL","conf":"East","div":"Southeast","pos":["G"],"ht":"6-5","htInches":77,"age":25,"jersey":"4","formerTeams":[],"nbaId":1630591},
+  {"id":449,"name":"Jae'Sean Tate","team":"HOU","conf":"West","div":"Southwest","pos":["F"],"ht":"6-4","htInches":76,"age":30,"jersey":"8","formerTeams":[],"nbaId":1630256},
+  {"id":450,"name":"Jayson Tatum","team":"BOS","conf":"East","div":"Atlantic","pos":["F", "G"],"ht":"6-8","htInches":80,"age":28,"jersey":"0","formerTeams":[],"nbaId":1628369},
+  {"id":451,"name":"Garrett Temple","team":"TOR","conf":"East","div":"Atlantic","pos":["G", "F"],"ht":"6-5","htInches":77,"age":40,"jersey":"17","formerTeams":["BKN", "CHI", "LAC", "NOP", "SAC", "WAS"],"nbaId":202066},
+  {"id":452,"name":"Dalen Terry","team":"PHI","conf":"East","div":"Atlantic","pos":["F"],"ht":"6-6","htInches":78,"age":23,"jersey":"14","formerTeams":["CHI"],"nbaId":1631207},
+  {"id":453,"name":"Adou Thiero","team":"LAL","conf":"West","div":"Pacific","pos":["G"],"ht":"6-7","htInches":79,"age":22,"jersey":"1","formerTeams":[],"nbaId":1642876},
+  {"id":454,"name":"Amen Thompson","team":"HOU","conf":"West","div":"Southwest","pos":["G", "F"],"ht":"6-7","htInches":79,"age":23,"jersey":"1","formerTeams":[],"nbaId":1641708},
+  {"id":455,"name":"Ausar Thompson","team":"DET","conf":"East","div":"Central","pos":["G", "F"],"ht":"6-7","htInches":79,"age":23,"jersey":"9","formerTeams":[],"nbaId":1641709},
+  {"id":456,"name":"Ethan Thompson","team":"IND","conf":"East","div":"Central","pos":["G"],"ht":"6-4","htInches":76,"age":27,"jersey":"55","formerTeams":[],"nbaId":1630679},
+  {"id":457,"name":"Klay Thompson","team":"DAL","conf":"West","div":"Southwest","pos":["G"],"ht":"6-5","htInches":77,"age":36,"jersey":"31","formerTeams":["GSW"],"nbaId":202691},
+  {"id":458,"name":"Matisse Thybulle","team":"POR","conf":"West","div":"Northwest","pos":["G", "F"],"ht":"6-5","htInches":77,"age":29,"jersey":"4","formerTeams":["PHI"],"nbaId":1629680},
+  {"id":459,"name":"Xavier Tillman","team":"CHA","conf":"East","div":"Southeast","pos":["F"],"ht":"6-8","htInches":80,"age":27,"jersey":"26","formerTeams":["BOS", "MEM"],"nbaId":1630214},
+  {"id":460,"name":"Drew Timme","team":"LAL","conf":"West","div":"Pacific","pos":["F"],"ht":"6-9","htInches":81,"age":25,"jersey":"17","formerTeams":["BKN"],"nbaId":1631166},
+  {"id":461,"name":"Nae'Qwan Tomlin","team":"CLE","conf":"East","div":"Central","pos":["F"],"ht":"6-8","htInches":80,"age":25,"jersey":"35","formerTeams":[],"nbaId":1641772},
+  {"id":462,"name":"John Tonje","team":"BOS","conf":"East","div":"Atlantic","pos":["G"],"ht":"6-4","htInches":76,"age":25,"jersey":"8","formerTeams":[],"nbaId":1642910},
+  {"id":463,"name":"Nikola Topi\u0107","team":"OKC","conf":"West","div":"Northwest","pos":["G"],"ht":"6-6","htInches":78,"age":20,"jersey":"44","formerTeams":[],"nbaId":1642260},
+  {"id":464,"name":"Obi Toppin","team":"IND","conf":"East","div":"Central","pos":["F"],"ht":"6-9","htInches":81,"age":28,"jersey":"1","formerTeams":["NYK"],"nbaId":1630167},
+  {"id":465,"name":"Karl-Anthony Towns","team":"NYK","conf":"East","div":"Atlantic","pos":["C", "F"],"ht":"7-0","htInches":84,"age":30,"jersey":"32","formerTeams":["MIN"],"nbaId":1626157},
+  {"id":466,"name":"Nolan Traore","team":"BKN","conf":"East","div":"Atlantic","pos":["G"],"ht":"6-3","htInches":75,"age":20,"jersey":"13","formerTeams":[],"nbaId":1642849},
+  {"id":467,"name":"Gary Trent Jr.","team":"MIL","conf":"East","div":"Central","pos":["G"],"ht":"6-5","htInches":77,"age":27,"jersey":"5","formerTeams":["POR", "TOR"],"nbaId":1629018},
+  {"id":468,"name":"Oscar Tshiebwe","team":"UTA","conf":"West","div":"Northwest","pos":["F", "C"],"ht":"6-8","htInches":80,"age":26,"jersey":"34","formerTeams":["IND"],"nbaId":1631131},
+  {"id":469,"name":"Myles Turner","team":"MIL","conf":"East","div":"Central","pos":["C", "F"],"ht":"6-11","htInches":83,"age":30,"jersey":"3","formerTeams":["IND"],"nbaId":1626167},
+  {"id":470,"name":"Jaylon Tyson","team":"CLE","conf":"East","div":"Central","pos":["G", "F"],"ht":"6-6","htInches":78,"age":23,"jersey":"20","formerTeams":[],"nbaId":1642281},
+  {"id":471,"name":"Jonas Valan\u010di\u016bnas","team":"DEN","conf":"West","div":"Northwest","pos":["C"],"ht":"6-11","htInches":83,"age":34,"jersey":"17","formerTeams":["MEM", "NOP", "SAC", "TOR"],"nbaId":202685},
+  {"id":472,"name":"Jarred Vanderbilt","team":"LAL","conf":"West","div":"Pacific","pos":["F"],"ht":"6-8","htInches":80,"age":27,"jersey":"2","formerTeams":["DEN", "MIN"],"nbaId":1629020},
+  {"id":473,"name":"Devin Vassell","team":"SAS","conf":"West","div":"Southwest","pos":["G", "F"],"ht":"6-5","htInches":77,"age":25,"jersey":"24","formerTeams":[],"nbaId":1630170},
+  {"id":474,"name":"Gabe Vincent","team":"ATL","conf":"East","div":"Southeast","pos":["G"],"ht":"6-2","htInches":74,"age":30,"jersey":"4","formerTeams":["LAL", "MIA"],"nbaId":1629216},
+  {"id":475,"name":"Tristan Vukcevic","team":"WAS","conf":"East","div":"Southeast","pos":["F"],"ht":"7-0","htInches":84,"age":23,"jersey":"00","formerTeams":[],"nbaId":1641774},
+  {"id":476,"name":"Nikola Vu\u010devi\u0107","team":"ORL","conf":"East","div":"Southeast","pos":["C"],"ht":"6-9","htInches":81,"age":35,"jersey":"4","formerTeams":["CHI"],"nbaId":202696},
+  {"id":477,"name":"Dean Wade","team":"CLE","conf":"East","div":"Central","pos":["F", "C"],"ht":"6-9","htInches":81,"age":29,"jersey":"32","formerTeams":[],"nbaId":1629731},
+  {"id":478,"name":"Franz Wagner","team":"ORL","conf":"East","div":"Southeast","pos":["F"],"ht":"6-10","htInches":82,"age":24,"jersey":"22","formerTeams":[],"nbaId":1630532},
+  {"id":479,"name":"Moritz Wagner","team":"ORL","conf":"East","div":"Southeast","pos":["F", "C"],"ht":"6-11","htInches":83,"age":29,"jersey":"21","formerTeams":["LAL", "WAS"],"nbaId":1629021},
+  {"id":480,"name":"Jabari Walker","team":"PHI","conf":"East","div":"Atlantic","pos":["F"],"ht":"6-7","htInches":79,"age":23,"jersey":"33","formerTeams":["POR"],"nbaId":1631133},
+  {"id":481,"name":"Jarace Walker","team":"IND","conf":"East","div":"Central","pos":["F"],"ht":"6-7","htInches":79,"age":22,"jersey":"5","formerTeams":[],"nbaId":1641716},
+  {"id":482,"name":"Cason Wallace","team":"OKC","conf":"West","div":"Northwest","pos":["G"],"ht":"6-3","htInches":75,"age":22,"jersey":"22","formerTeams":[],"nbaId":1641717},
+  {"id":483,"name":"Keaton Wallace","team":"ATL","conf":"East","div":"Southeast","pos":["G"],"ht":"6-3","htInches":75,"age":27,"jersey":"2","formerTeams":[],"nbaId":1630811},
+  {"id":484,"name":"Jordan Walsh","team":"BOS","conf":"East","div":"Atlantic","pos":["G"],"ht":"6-6","htInches":78,"age":22,"jersey":"27","formerTeams":[],"nbaId":1641775},
+  {"id":485,"name":"Ja'Kobe Walter","team":"TOR","conf":"East","div":"Atlantic","pos":["G"],"ht":"6-4","htInches":76,"age":21,"jersey":"14","formerTeams":[],"nbaId":1642266},
+  {"id":486,"name":"Kel'el Ware","team":"MIA","conf":"East","div":"Southeast","pos":["C"],"ht":"7-0","htInches":84,"age":22,"jersey":"7","formerTeams":[],"nbaId":1642276},
+  {"id":487,"name":"P.J. Washington","team":"DAL","conf":"West","div":"Southwest","pos":["F"],"ht":"6-7","htInches":79,"age":27,"jersey":"25","formerTeams":["CHA"],"nbaId":1629023},
+  {"id":488,"name":"TyTy Washington Jr.","team":"LAC","conf":"West","div":"Pacific","pos":["G"],"ht":"6-3","htInches":75,"age":24,"jersey":"14","formerTeams":["HOU", "MIL", "PHX"],"nbaId":1631102},
+  {"id":489,"name":"Lindy Waters III","team":"SAS","conf":"West","div":"Southwest","pos":["F"],"ht":"6-5","htInches":77,"age":28,"jersey":"43","formerTeams":["DET", "OKC"],"nbaId":1630322},
+  {"id":490,"name":"Trendon Watford","team":"PHI","conf":"East","div":"Atlantic","pos":["G", "F"],"ht":"6-8","htInches":80,"age":25,"jersey":"12","formerTeams":["BKN", "POR"],"nbaId":1630570},
+  {"id":491,"name":"Jamir Watkins","team":"WAS","conf":"East","div":"Southeast","pos":["F"],"ht":"6-6","htInches":78,"age":24,"jersey":"5","formerTeams":[],"nbaId":1642364},
+  {"id":492,"name":"Peyton Watson","team":"DEN","conf":"West","div":"Northwest","pos":["G"],"ht":"6-8","htInches":80,"age":23,"jersey":"8","formerTeams":[],"nbaId":1631212},
+  {"id":493,"name":"Jaylen Wells","team":"MEM","conf":"West","div":"Southwest","pos":["F"],"ht":"6-7","htInches":79,"age":22,"jersey":"0","formerTeams":[],"nbaId":1642377},
+  {"id":494,"name":"Victor Wembanyama","team":"SAS","conf":"West","div":"Southwest","pos":["F", "C"],"ht":"7-4","htInches":88,"age":22,"jersey":"1","formerTeams":[],"nbaId":1641705},
+  {"id":495,"name":"Blake Wesley","team":"POR","conf":"West","div":"Northwest","pos":["G"],"ht":"6-4","htInches":76,"age":23,"jersey":"1","formerTeams":["SAS"],"nbaId":1631104},
+  {"id":496,"name":"Russell Westbrook","team":"SAC","conf":"West","div":"Pacific","pos":["G"],"ht":"6-4","htInches":76,"age":37,"jersey":"18","formerTeams":["DEN", "HOU", "LAC", "LAL", "OKC", "WAS"],"nbaId":201566},
+  {"id":497,"name":"Coby White","team":"CHA","conf":"East","div":"Southeast","pos":["G"],"ht":"6-4","htInches":76,"age":26,"jersey":"3","formerTeams":["CHI"],"nbaId":1629632},
+  {"id":498,"name":"Derrick White","team":"BOS","conf":"East","div":"Atlantic","pos":["G"],"ht":"6-4","htInches":76,"age":32,"jersey":"9","formerTeams":["SAS"],"nbaId":1628401},
+  {"id":499,"name":"Cam Whitmore","team":"WAS","conf":"East","div":"Southeast","pos":["F"],"ht":"6-6","htInches":78,"age":21,"jersey":"1","formerTeams":["HOU"],"nbaId":1641715},
+  {"id":500,"name":"Aaron Wiggins","team":"OKC","conf":"West","div":"Northwest","pos":["G"],"ht":"6-5","htInches":77,"age":27,"jersey":"21","formerTeams":[],"nbaId":1630598},
+  {"id":501,"name":"Andrew Wiggins","team":"MIA","conf":"East","div":"Southeast","pos":["F"],"ht":"6-6","htInches":78,"age":31,"jersey":"22","formerTeams":["GSW", "MIN"],"nbaId":203952},
+  {"id":502,"name":"Amari Williams","team":"BOS","conf":"East","div":"Atlantic","pos":["F", "C"],"ht":"6-11","htInches":83,"age":24,"jersey":"77","formerTeams":[],"nbaId":1642873},
+  {"id":503,"name":"Brandon Williams","team":"DAL","conf":"West","div":"Southwest","pos":["G"],"ht":"6-1","htInches":73,"age":26,"jersey":"10","formerTeams":["POR"],"nbaId":1630314},
+  {"id":504,"name":"Cody Williams","team":"UTA","conf":"West","div":"Northwest","pos":["F"],"ht":"6-8","htInches":80,"age":21,"jersey":"5","formerTeams":[],"nbaId":1642262},
+  {"id":505,"name":"Grant Williams","team":"CHA","conf":"East","div":"Southeast","pos":["F"],"ht":"6-7","htInches":79,"age":27,"jersey":"2","formerTeams":["BOS"],"nbaId":1629684},
+  {"id":506,"name":"Jalen Williams","team":"OKC","conf":"West","div":"Northwest","pos":["G", "F"],"ht":"6-5","htInches":77,"age":25,"jersey":"8","formerTeams":[],"nbaId":1631114},
+  {"id":507,"name":"Jaylin Williams","team":"OKC","conf":"West","div":"Northwest","pos":["F"],"ht":"6-9","htInches":81,"age":24,"jersey":"6","formerTeams":[],"nbaId":1631119},
+  {"id":508,"name":"Kenrich Williams","team":"OKC","conf":"West","div":"Northwest","pos":["G", "F"],"ht":"6-7","htInches":79,"age":31,"jersey":"34","formerTeams":["NOP"],"nbaId":1629026},
+  {"id":509,"name":"Mark Williams","team":"PHX","conf":"West","div":"Pacific","pos":["C"],"ht":"7-1","htInches":85,"age":24,"jersey":"15","formerTeams":["CHA"],"nbaId":1631109},
+  {"id":510,"name":"Nate Williams","team":"GSW","conf":"West","div":"Pacific","pos":["G"],"ht":"6-5","htInches":77,"age":27,"jersey":"19","formerTeams":["HOU", "POR"],"nbaId":1631466},
+  {"id":511,"name":"Patrick Williams","team":"CHI","conf":"East","div":"Central","pos":["F"],"ht":"6-6","htInches":78,"age":24,"jersey":"44","formerTeams":[],"nbaId":1630172},
+  {"id":512,"name":"Ziaire Williams","team":"BKN","conf":"East","div":"Atlantic","pos":["F"],"ht":"6-9","htInches":81,"age":24,"jersey":"1","formerTeams":["MEM"],"nbaId":1630533},
+  {"id":513,"name":"Robert Williams III","team":"POR","conf":"West","div":"Northwest","pos":["C", "F"],"ht":"6-9","htInches":81,"age":28,"jersey":"35","formerTeams":["BOS"],"nbaId":1629057},
+  {"id":514,"name":"Zion Williamson","team":"NOP","conf":"West","div":"Southwest","pos":["F"],"ht":"6-6","htInches":78,"age":25,"jersey":"1","formerTeams":[],"nbaId":1629627},
+  {"id":515,"name":"Jalen Wilson","team":"BKN","conf":"East","div":"Atlantic","pos":["F"],"ht":"6-6","htInches":78,"age":25,"jersey":"22","formerTeams":[],"nbaId":1630592},
+  {"id":516,"name":"Danny Wolf","team":"BKN","conf":"East","div":"Atlantic","pos":["F"],"ht":"6-11","htInches":83,"age":22,"jersey":"2","formerTeams":[],"nbaId":1642874},
+  {"id":517,"name":"Guerschon Yabusele","team":"CHI","conf":"East","div":"Central","pos":["F"],"ht":"6-7","htInches":79,"age":30,"jersey":"28","formerTeams":["BOS", "PHI"],"nbaId":1627824},
+  {"id":518,"name":"Yang Hansen","team":"POR","conf":"West","div":"Northwest","pos":["C"],"ht":"7-1","htInches":85,"age":21,"jersey":"16","formerTeams":[],"nbaId":1642905},
+  {"id":519,"name":"Jahmir Young","team":"MIA","conf":"East","div":"Southeast","pos":["G"],"ht":"6-0","htInches":72,"age":25,"jersey":"17","formerTeams":["CHI"],"nbaId":1642443},
+  {"id":520,"name":"Trae Young","team":"WAS","conf":"East","div":"Southeast","pos":["G"],"ht":"6-2","htInches":74,"age":27,"jersey":"3","formerTeams":["ATL"],"nbaId":1629027},
+  {"id":521,"name":"Chris Youngblood","team":"POR","conf":"West","div":"Northwest","pos":["G"],"ht":"6-4","htInches":76,"age":24,"jersey":"3","formerTeams":[],"nbaId":1642959},
+  {"id":522,"name":"Rocco Zikarsky","team":"MIN","conf":"West","div":"Northwest","pos":["C"],"ht":"7-3","htInches":87,"age":19,"jersey":"44","formerTeams":[],"nbaId":1642911},
+  {"id":523,"name":"Ivica Zubac","team":"IND","conf":"East","div":"Central","pos":["C"],"ht":"7-0","htInches":84,"age":29,"jersey":"40","formerTeams":["LAC", "LAL"],"nbaId":1627826},
+  {"id":524,"name":"Tristan da Silva","team":"ORL","conf":"East","div":"Southeast","pos":["F"],"ht":"6-8","htInches":80,"age":25,"jersey":"23","formerTeams":[],"nbaId":1641783},
+  {"id":525,"name":"Tyrese Haliburton","team":"IND","conf":"East","div":"Central","pos":["G"],"ht":"6-5","htInches":77,"age":26,"jersey":"0","formerTeams":[],"nbaId":1630169},
+  {"id":526,"name":"Kyrie Irving","team":"DAL","conf":"West","div":"Southwest","pos":["G"],"ht":"6-2","htInches":74,"age":34,"jersey":"11","formerTeams":[],"nbaId":202681},
+  {"id":527,"name":"Damian Lillard","team":"POR","conf":"West","div":"Northwest","pos":["G"],"ht":"6-2","htInches":74,"age":35,"jersey":"0","formerTeams":[],"nbaId":203081},
+  {"id":528,"name":"Thomas Sorber","team":"OKC","conf":"West","div":"Northwest","pos":["C"],"ht":"6-9","htInches":81,"age":20,"jersey":"12","formerTeams":[],"nbaId":1642850},
+  {"id":529,"name":"Fred VanVleet","team":"HOU","conf":"West","div":"Southwest","pos":["G"],"ht":"6-0","htInches":72,"age":32,"jersey":"5","formerTeams":[],"nbaId":1627832}
+];
+
+
+// ═══════════════════════════════════════════════════════════════
+// GAME LOGIC
+// ═══════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════
+   NBA MYSTERY PLAYER — Game Logic
+   ═══════════════════════════════════════════════════════════ */
+
+// ── Constants ──────────────────────────────────────────────
+const MAX_GUESSES = 8;
+const STORAGE_KEY = 'nbaMysteryPlayer';
+const COLUMNS = ['Team', 'Conf', 'Div', 'Pos', 'Ht', 'Age', '#'];
+
+// ── State ──────────────────────────────────────────────────
+let mysteryPlayer = null;
+let guesses = [];
+let gameOver = false;
+
+// ── DOM Refs ───────────────────────────────────────────────
+const dom = {
+  searchInput: null,
+  searchDropdown: null,
+  guessBody: null,
+  remainingEl: null,
+  silhouetteBtn: null,
+  silhouetteImg: null,
+  overlay: null,
+  toast: null,
+};
+
+// ── Random Selection ───────────────────────────────────────
+function getRandomIndex() {
+  return Math.floor(Math.random() * PLAYERS.length);
+}
+
+// ── Init ───────────────────────────────────────────────────
+function initGame() {
+  cacheDom();
+  loadState();
+
+  if (!mysteryPlayer) {
+    const idx = getRandomIndex();
+    mysteryPlayer = PLAYERS[idx];
+    guesses = [];
+    gameOver = false;
+    saveState();
+    clearTable();
+    updateRemaining();
+  }
+
+  renderExistingGuesses();
+  updateRemaining();
+  bindEvents();
+
+  if (gameOver) {
+    dom.searchInput.disabled = true;
+    dom.searchInput.placeholder = 'Game over';
+  }
+
+  console.log(`Mystery player: ${mysteryPlayer.name} (#${mysteryPlayer.id})`);
+
+  // Preload silhouette image in background
+  preloadSilhouette();
+}
+
+function cacheDom() {
+  dom.searchInput = document.getElementById('searchInput');
+  dom.searchDropdown = document.getElementById('searchDropdown');
+  dom.guessBody = document.getElementById('guessBody');
+  dom.remainingEl = document.getElementById('remaining');
+  dom.silhouetteBtn = document.getElementById('silhouetteBtn');
+  dom.silhouetteImg = document.getElementById('silhouetteImg');
+  dom.overlay = document.getElementById('overlay');
+  dom.toast = document.getElementById('toast');
+}
+
+// ── State Persistence ──────────────────────────────────────
+function saveState() {
+  const state = {
+    date: new Date().toISOString().slice(0, 10),
+    mysteryId: mysteryPlayer ? mysteryPlayer.id : null,
+    guesses: guesses,
+    gameOver: gameOver,
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  localStorage.setItem(STORAGE_KEY + '_date', state.date);
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const state = JSON.parse(raw);
+      guesses = state.guesses || [];
+      gameOver = state.gameOver || false;
+      if (state.mysteryId !== null && state.mysteryId !== undefined) {
+        mysteryPlayer = PLAYERS.find(p => p.id === state.mysteryId) || null;
+      }
+    }
+  } catch (e) {
+    guesses = [];
+    gameOver = false;
+  }
+}
+
+// ── Search / Autocomplete ──────────────────────────────────
+let activeIndex = -1;
+let searchResults = [];
+
+function bindEvents() {
+  dom.searchInput.addEventListener('input', onSearchInput);
+  dom.searchInput.addEventListener('keydown', onSearchKeydown);
+  dom.searchInput.addEventListener('focus', onSearchInput);
+  document.addEventListener('click', onDocumentClick);
+  dom.silhouetteBtn.addEventListener('click', toggleSilhouette);
+  document.getElementById('newGameBtn').addEventListener('click', resetGame);
+
+  // Overlay buttons
+  document.getElementById('shareBtn').addEventListener('click', copyShare);
+  document.getElementById('playAgainBtn')?.addEventListener('click', resetGame);
+}
+
+function onSearchInput() {
+  const query = dom.searchInput.value.trim().toLowerCase();
+  activeIndex = -1;
+
+  if (!query) {
+    dom.searchDropdown.classList.remove('search__dropdown--open');
+    searchResults = [];
+    return;
+  }
+
+  // Filter players by name substring (case-insensitive, accent-insensitive)
+  searchResults = PLAYERS
+    .filter(p => normalizeStr(p.name).includes(normalizeStr(query)))
+    .slice(0, 8);
+
+  renderDropdown(searchResults);
+}
+
+function renderDropdown(results) {
+  dom.searchDropdown.innerHTML = '';
+
+  if (results.length === 0) {
+    dom.searchDropdown.innerHTML =
+      '<div class="search__no-results">No players found</div>';
+  } else {
+    results.forEach((p, i) => {
+      const div = document.createElement('div');
+      div.className = 'search__item';
+      div.innerHTML = `<span>${escapeHtml(p.name)}</span>
+        <span class="search__item-team">${p.team} ${p.pos.join('-')}</span>`;
+      div.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        selectPlayer(p);
+      });
+      dom.searchDropdown.appendChild(div);
+    });
+  }
+
+  dom.searchDropdown.classList.add('search__dropdown--open');
+}
+
+function onSearchKeydown(e) {
+  const items = dom.searchDropdown.querySelectorAll('.search__item');
+
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    activeIndex = Math.min(activeIndex + 1, items.length - 1);
+    updateActiveItem(items);
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    activeIndex = Math.max(activeIndex - 1, 0);
+    updateActiveItem(items);
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (activeIndex >= 0 && searchResults[activeIndex]) {
+      selectPlayer(searchResults[activeIndex]);
+    }
+  } else if (e.key === 'Escape') {
+    dom.searchDropdown.classList.remove('search__dropdown--open');
+    dom.searchInput.blur();
+  }
+}
+
+function updateActiveItem(items) {
+  items.forEach((item, i) => {
+    item.classList.toggle('search__item--active', i === activeIndex);
+  });
+  if (activeIndex >= 0 && items[activeIndex]) {
+    items[activeIndex].scrollIntoView({ block: 'nearest' });
+  }
+}
+
+function onDocumentClick(e) {
+  if (!dom.searchInput.contains(e.target) && !dom.searchDropdown.contains(e.target)) {
+    dom.searchDropdown.classList.remove('search__dropdown--open');
+  }
+}
+
+// ── Player Selection & Guessing ────────────────────────────
+function selectPlayer(player) {
+  if (gameOver) return;
+
+  // Check duplicate
+  if (guesses.some(g => g.id === player.id)) {
+    showToast('Already guessed this player');
+    return;
+  }
+
+  // Submit guess
+  guesses.push(player);
+  addGuessRow(player);
+
+  dom.searchInput.value = '';
+  dom.searchDropdown.classList.remove('search__dropdown--open');
+  searchResults = [];
+  activeIndex = -1;
+
+  updateRemaining();
+  saveState();
+
+  // Check win
+  if (player.id === mysteryPlayer.id) {
+    endGame(true);
+  } else if (guesses.length >= MAX_GUESSES) {
+    endGame(false);
+  }
+}
+
+// ── Comparison Engine ──────────────────────────────────────
+function compareTeam(guess, answer) {
+  if (guess.team === answer.team) return 'green';
+  if (answer.formerTeams.includes(guess.team)) return 'yellow';
+  return 'black';
+}
+
+function compareConf(guess, answer) {
+  return guess.conf === answer.conf ? 'green' : 'black';
+}
+
+function compareDiv(guess, answer) {
+  return guess.div === answer.div ? 'green' : 'black';
+}
+
+function comparePos(guess, answer) {
+  const gSet = new Set(guess.pos);
+  const aSet = new Set(answer.pos);
+  if (gSet.size === aSet.size && [...gSet].every(x => aSet.has(x))) return 'green';
+  if ([...gSet].some(x => aSet.has(x))) return 'yellow';
+  return 'black';
+}
+
+function compareNumeric(guessVal, answerVal) {
+  const diff = Math.abs(guessVal - answerVal);
+  if (diff === 0) return { color: 'green', arrow: '' };
+  if (diff <= 2) {
+    const arrow = guessVal < answerVal ? '↑' : '↓';
+    return { color: 'yellow', arrow };
+  }
+  const arrow = guessVal < answerVal ? '↑' : '↓';
+  return { color: 'black', arrow };
+}
+
+function compareAll(guess, answer) {
+  return {
+    team: compareTeam(guess, answer),
+    conf: compareConf(guess, answer),
+    div: compareDiv(guess, answer),
+    pos: comparePos(guess, answer),
+    ht: compareNumeric(guess.htInches, answer.htInches),
+    age: compareNumeric(guess.age, answer.age),
+    jersey: compareJersey(guess.jersey, answer.jersey),
+  };
+}
+
+function compareJersey(gJersey, aJersey) {
+  // Normalize: "0", "00" → 0; non-numeric → -1
+  const gNum = parseInt(gJersey, 10);
+  const aNum = parseInt(aJersey, 10);
+  const gIsNum = !isNaN(gNum);
+  const aIsNum = !isNaN(aNum);
+
+  // Both numeric: compare numerically
+  if (gIsNum && aIsNum) {
+    if (gNum === aNum) return { color: 'green', arrow: '' };
+    const diff = Math.abs(gNum - aNum);
+    if (diff <= 2) {
+      return { color: 'yellow', arrow: gNum < aNum ? '↑' : '↓' };
+    }
+    return { color: 'black', arrow: gNum < aNum ? '↑' : '↓' };
+  }
+
+  // String comparison for non-numeric jerseys (e.g. "N/A")
+  if (gJersey === aJersey) return { color: 'green', arrow: '' };
+  return { color: 'black', arrow: '' };
+}
+
+// ── Render ─────────────────────────────────────────────────
+function addGuessRow(player) {
+  const result = compareAll(player, mysteryPlayer);
+  const row = document.createElement('tr');
+  row.className = 'guess-row';
+
+  // Determine cell order matching headers
+  const cells = [
+    { key: 'team', display: player.team },
+    { key: 'conf', display: player.conf },
+    { key: 'div', display: player.div },
+    { key: 'pos', display: player.pos.join('-') },
+    { key: 'ht', display: player.ht },
+    { key: 'age', display: String(player.age) },
+    { key: 'jersey', display: player.jersey },
+  ];
+
+  cells.forEach(cell => {
+    const td = document.createElement('td');
+    const res = result[cell.key];
+
+    if (cell.key === 'ht' || cell.key === 'age' || cell.key === 'jersey') {
+      // Numeric columns: res is { color, arrow }
+      td.className = `cell--${res.color}`;
+      td.innerHTML = `${cell.display}<span class="cell-arrow">${res.arrow}</span>`;
+    } else {
+      // Text columns (team/conf/div/pos): res is a color string directly
+      td.className = `cell--${res}`;
+      td.textContent = cell.display;
+    }
+    row.appendChild(td);
+  });
+
+  dom.guessBody.appendChild(row);
+}
+
+function renderExistingGuesses() {
+  dom.guessBody.innerHTML = '';
+  guesses.forEach(g => addGuessRow(g));
+}
+
+function clearTable() {
+  dom.guessBody.innerHTML = '';
+}
+
+function updateRemaining() {
+  const remaining = MAX_GUESSES - guesses.length;
+  dom.remainingEl.textContent = remaining;
+  if (remaining <= 3) {
+    dom.remainingEl.style.color = remaining <= 1 ? 'var(--danger)' : 'var(--yellow)';
+  } else {
+    dom.remainingEl.style.color = 'var(--text)';
+  }
+}
+
+// ── Game End ───────────────────────────────────────────────
+function endGame(won) {
+  gameOver = true;
+  saveState();
+  dom.searchInput.disabled = true;
+  dom.searchInput.placeholder = 'Game over';
+
+  // Reveal player photo on win
+  if (won) {
+    revealPlayerImage();
+  }
+
+  setTimeout(() => {
+    showOverlay(won);
+  }, won ? 600 : 1000);
+}
+
+function revealPlayerImage() {
+  if (mysteryPlayer && mysteryPlayer.nbaId) {
+    dom.silhouetteImg.src = getHeadshotUrl(mysteryPlayer.nbaId);
+  }
+  dom.silhouetteImg.classList.add('silhouette__img--visible', 'silhouette__img--revealed');
+  dom.silhouetteBtn.textContent = '🙈 Hide Silhouette';
+}
+
+function resetGame() {
+  const idx = getRandomIndex();
+  mysteryPlayer = PLAYERS[idx];
+  guesses = [];
+  gameOver = false;
+
+  dom.searchInput.disabled = false;
+  dom.searchInput.placeholder = '🔍  Type a player name...';
+  dom.overlay.classList.remove('overlay--visible');
+
+  // Reset silhouette
+  dom.silhouetteImg.classList.remove('silhouette__img--visible', 'silhouette__img--revealed');
+  dom.silhouetteImg.src = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+  dom.silhouetteBtn.textContent = '👤 Reveal Silhouette';
+
+  clearTable();
+  updateRemaining();
+  saveState();
+  preloadSilhouette();
+
+  console.log(`New mystery player: ${mysteryPlayer.name} (#${mysteryPlayer.id})`);
+}
+
+function showOverlay(won) {
+  const titleEl = document.getElementById('overlayTitle');
+  const subtitleEl = document.getElementById('overlaySubtitle');
+  const answerEl = document.getElementById('overlayAnswer');
+  const answerTeamEl = document.getElementById('overlayAnswerTeam');
+  const shareGrid = document.getElementById('shareGrid');
+
+  if (won) {
+    titleEl.textContent = '🎉 You Got It!';
+    subtitleEl.textContent = `Solved in ${guesses.length}/${MAX_GUESSES} guesses`;
+  } else {
+    titleEl.textContent = '😞 Game Over';
+    subtitleEl.textContent = `The mystery player was:`;
+  }
+
+  answerEl.textContent = mysteryPlayer.name;
+  answerTeamEl.textContent = `${mysteryPlayer.team} | ${mysteryPlayer.pos.join('-')} | ${mysteryPlayer.ht}`;
+  shareGrid.textContent = generateShareGrid(won);
+
+  dom.overlay.classList.add('overlay--visible');
+}
+
+function generateShareGrid(won) {
+  const date = new Date().toISOString().slice(0, 10);
+  let text = `🏀 NBA Mystery Player ${date} 🏀\n`;
+
+  guesses.forEach(g => {
+    const result = compareAll(g, mysteryPlayer);
+    const emojis = [
+      result.team, result.conf, result.div, result.pos,
+      result.ht.color, result.age.color, result.jersey.color,
+    ].map(c => {
+      if (c === 'green' || (c.color === 'green')) return '🟩';
+      if (c === 'yellow' || (c.color === 'yellow')) return '🟨';
+      return '⬛';
+    }).join('');
+    text += emojis + '\n';
+  });
+
+  if (won) {
+    text += `Solved in ${guesses.length}/${MAX_GUESSES}!`;
+  } else {
+    text += `Failed after ${MAX_GUESSES} guesses`;
+  }
+
+  return text;
+}
+
+function copyShare() {
+  const won = guesses.length > 0 && guesses[guesses.length - 1].id === mysteryPlayer.id;
+  const text = generateShareGrid(won);
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('Copied to clipboard!');
+  }).catch(() => {
+    showToast('Failed to copy');
+  });
+}
+
+// ── Silhouette ─────────────────────────────────────────────
+function getHeadshotUrl(nbaId) {
+  // 260x190 loads ~10x faster than 1040x760, sufficient for 200px display
+  return `https://cdn.nba.com/headshots/nba/latest/260x190/${nbaId}.png`;
+}
+
+function preloadSilhouette() {
+  if (mysteryPlayer && mysteryPlayer.nbaId) {
+    const img = new Image();
+    img.src = getHeadshotUrl(mysteryPlayer.nbaId);
+  }
+}
+
+function toggleSilhouette() {
+  const isVisible = dom.silhouetteImg.classList.contains('silhouette__img--visible');
+  if (isVisible) {
+    dom.silhouetteImg.classList.remove('silhouette__img--visible');
+    dom.silhouetteBtn.textContent = '👤 Reveal Silhouette';
+  } else {
+    if (mysteryPlayer && mysteryPlayer.nbaId) {
+      dom.silhouetteImg.src = getHeadshotUrl(mysteryPlayer.nbaId);
+    }
+    dom.silhouetteImg.classList.add('silhouette__img--visible');
+    dom.silhouetteBtn.textContent = '🙈 Hide Silhouette';
+  }
+}
+
+// ── Toast ──────────────────────────────────────────────────
+let toastTimer = null;
+
+function showToast(msg) {
+  dom.toast.textContent = msg;
+  dom.toast.classList.add('toast--visible');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    dom.toast.classList.remove('toast--visible');
+  }, 2000);
+}
+
+// ── Utils ──────────────────────────────────────────────────
+function normalizeStr(str) {
+  // Strip diacritics so "Dončić" matches "Doncic"
+  return str.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// ── Bootstrap ──────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', initGame);
+
+</script>
+
+</body>
+</html>
