@@ -63,11 +63,9 @@ html = f'''<!DOCTYPE html>
   <!-- Silhouette Hint -->
   <div class="silhouette">
     <button id="silhouetteBtn" class="silhouette__btn">👤 Reveal Silhouette</button>
-    <div id="silhouetteWrap" class="silhouette__wrap">
-      <img id="silhouetteImg" class="silhouette__img"
-           src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-           alt="Player silhouette">
-    </div>
+    <img id="silhouetteImg" class="silhouette__img"
+         src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+         alt="Player silhouette">
   </div>
 
   <!-- Guess Table -->

@@ -48,7 +48,6 @@ const dom = {
   remainingEl: null,
   silhouetteBtn: null,
   silhouetteImg: null,
-  silhouetteWrap: null,
   overlay: null,
   toast: null,
 };
@@ -95,7 +94,6 @@ function cacheDom() {
   dom.remainingEl = document.getElementById('remaining');
   dom.silhouetteBtn = document.getElementById('silhouetteBtn');
   dom.silhouetteImg = document.getElementById('silhouetteImg');
-  dom.silhouetteWrap = document.getElementById('silhouetteWrap');
   dom.overlay = document.getElementById('overlay');
   dom.toast = document.getElementById('toast');
 }
@@ -413,8 +411,7 @@ function revealPlayerImage() {
     dom.silhouetteImg.onload = null;
     dom.silhouetteImg.onerror = null;
   }
-  dom.silhouetteWrap.classList.add('silhouette__wrap--visible');
-  dom.silhouetteImg.classList.add('silhouette__img--revealed');
+  dom.silhouetteImg.classList.add('silhouette__img--visible', 'silhouette__img--revealed');
   dom.silhouetteBtn.textContent = '🙈 Hide Silhouette';
 }
 
@@ -429,8 +426,7 @@ function resetGame() {
   dom.overlay.classList.remove('overlay--visible');
 
   // Reset silhouette
-  dom.silhouetteWrap.classList.remove('silhouette__wrap--visible');
-  dom.silhouetteImg.classList.remove('silhouette__img--revealed');
+  dom.silhouetteImg.classList.remove('silhouette__img--visible', 'silhouette__img--revealed');
   dom.silhouetteImg.src = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
   dom.silhouetteBtn.textContent = '👤 Reveal Silhouette';
 
@@ -520,9 +516,9 @@ function preloadSilhouette() {
 }
 
 function toggleSilhouette() {
-  const isVisible = dom.silhouetteWrap.classList.contains('silhouette__wrap--visible');
+  const isVisible = dom.silhouetteImg.classList.contains('silhouette__img--visible');
   if (isVisible) {
-    dom.silhouetteWrap.classList.remove('silhouette__wrap--visible');
+    dom.silhouetteImg.classList.remove('silhouette__img--visible');
     dom.silhouetteBtn.textContent = '👤 Reveal Silhouette';
   } else {
     if (mysteryPlayer && mysteryPlayer.nbaId) {
@@ -537,12 +533,12 @@ function toggleSilhouette() {
 
       // Handle load failure
       dom.silhouetteImg.onerror = () => {
-        dom.silhouetteWrap.classList.remove('silhouette__wrap--visible');
+        dom.silhouetteImg.classList.remove('silhouette__img--visible');
         showToast('Image failed to load. Check your network or try again.');
         dom.silhouetteBtn.textContent = '👤 Reveal Silhouette';
       };
     }
-    dom.silhouetteWrap.classList.add('silhouette__wrap--visible');
+    dom.silhouetteImg.classList.add('silhouette__img--visible');
     dom.silhouetteBtn.textContent = '⏳ Loading...';
   }
 }
