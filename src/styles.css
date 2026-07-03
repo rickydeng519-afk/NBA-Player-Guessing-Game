@@ -303,6 +303,8 @@ body.mode--2013 .share__btn--play-again:hover {
   max-width: 200px;
   margin: 16px auto 0;
   border-radius: var(--radius);
+  background: #fff;
+  padding: 8px;
   filter: brightness(0);
   opacity: 0.9;
   box-shadow: var(--shadow);
