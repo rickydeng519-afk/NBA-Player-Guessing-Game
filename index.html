@@ -28,7 +28,8 @@
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
   --shadow: 0 2px 10px rgba(0,0,0,0.07);
   --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
-  --accent: #1a73e8;
+  --accent: #006BB6;
+  --accent-secondary: #F58426;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -64,7 +65,7 @@ body {
   font-size: 1.6rem;
   font-weight: 800;
   letter-spacing: -0.02em;
-  color: var(--text);
+  color: var(--accent);
 }
 
 .header__subtitle {
@@ -204,7 +205,7 @@ body.mode--2013 .share__btn--play-again:hover {
 .search__input:focus {
   border-color: var(--accent);
   background: #fff;
-  box-shadow: 0 0 0 4px rgba(26,115,232,0.1);
+  box-shadow: 0 0 0 4px rgba(0,107,182,0.1);
 }
 
 .search__input::placeholder { color: var(--text-dim); }
@@ -279,8 +280,8 @@ body.mode--2013 .share__btn--play-again:hover {
 }
 
 .silhouette__btn:hover {
-  background: #1a1a2e;
-  border-color: #1a1a2e;
+  background: var(--accent);
+  border-color: var(--accent);
   color: #fff;
   transform: translateY(-2px);
   box-shadow: var(--shadow);
@@ -573,7 +574,7 @@ body.mode--2013 .share__btn--play-again:hover {
     <h1 class="header__title">🏀 NBA Mystery Player</h1>
     <p class="header__subtitle">Guess the hidden player — endless mode</p>
     <div class="mode-tabs">
-      <button id="modeCurrent" class="mode-tab mode-tab--active">♾️ Endless</button>
+      <button id="modeCurrent" class="mode-tab mode-tab--active">🗽 群雄逐鹿</button>
       <button id="mode2013" class="mode-tab">👑 吾皇登基</button>
     </div>
     <button id="newGameBtn" class="header__new-game">🔄 New Game</button>
@@ -8446,7 +8447,7 @@ function switchMode(mode) {
   if (subtitle) {
     subtitle.textContent = mode === '2013'
       ? '2012-13 Season · 吾皇登基'
-      : 'Guess the hidden player — endless mode';
+      : 'Current Season · 群雄逐鹿';
   }
 
   // Toggle active button
@@ -8454,7 +8455,7 @@ function switchMode(mode) {
   document.getElementById('mode2013')?.classList.toggle('mode-tab--active', mode === '2013');
 
   resetGame();
-  console.log(`Switched to ${mode === '2013' ? '👑 吾皇登基 (2012-13)' : '♾️ Endless (current)'}`);
+  console.log(`Switched to ${mode === '2013' ? '👑 吾皇登基 (2012-13)' : '🗽 群雄逐鹿 (current)'}`);
 }
 
 // ── State ──────────────────────────────────────────────────
@@ -8884,7 +8885,7 @@ function showOverlay(won) {
 
 function generateShareGrid(won) {
   const date = new Date().toISOString().slice(0, 10);
-  const modeLabel = currentMode === '2013' ? '👑 吾皇登基 2012-13' : '🏀 NBA Mystery Player';
+  const modeLabel = currentMode === '2013' ? '👑 吾皇登基 2012-13' : '🗽 群雄逐鹿';
   let text = `${modeLabel} ${date}\n`;
 
   guesses.forEach(g => {

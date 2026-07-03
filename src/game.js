@@ -24,7 +24,7 @@ function switchMode(mode) {
   if (subtitle) {
     subtitle.textContent = mode === '2013'
       ? '2012-13 Season · 吾皇登基'
-      : 'Guess the hidden player — endless mode';
+      : 'Current Season · 群雄逐鹿';
   }
 
   // Toggle active button
@@ -32,7 +32,7 @@ function switchMode(mode) {
   document.getElementById('mode2013')?.classList.toggle('mode-tab--active', mode === '2013');
 
   resetGame();
-  console.log(`Switched to ${mode === '2013' ? '👑 吾皇登基 (2012-13)' : '♾️ Endless (current)'}`);
+  console.log(`Switched to ${mode === '2013' ? '👑 吾皇登基 (2012-13)' : '🗽 群雄逐鹿 (current)'}`);
 }
 
 // ── State ──────────────────────────────────────────────────
@@ -462,7 +462,7 @@ function showOverlay(won) {
 
 function generateShareGrid(won) {
   const date = new Date().toISOString().slice(0, 10);
-  const modeLabel = currentMode === '2013' ? '👑 吾皇登基 2012-13' : '🏀 NBA Mystery Player';
+  const modeLabel = currentMode === '2013' ? '👑 吾皇登基 2012-13' : '🗽 群雄逐鹿';
   let text = `${modeLabel} ${date}\n`;
 
   guesses.forEach(g => {

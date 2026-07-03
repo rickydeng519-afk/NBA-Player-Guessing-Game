@@ -39,7 +39,7 @@ html = f'''<!DOCTYPE html>
     <h1 class="header__title">🏀 NBA Mystery Player</h1>
     <p class="header__subtitle">Guess the hidden player — endless mode</p>
     <div class="mode-tabs">
-      <button id="modeCurrent" class="mode-tab mode-tab--active">♾️ Endless</button>
+      <button id="modeCurrent" class="mode-tab mode-tab--active">🗽 群雄逐鹿</button>
       <button id="mode2013" class="mode-tab">👑 吾皇登基</button>
     </div>
     <button id="newGameBtn" class="header__new-game">🔄 New Game</button>
