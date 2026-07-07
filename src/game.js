@@ -36,6 +36,14 @@ function saveStats(stats) {
 function recordGameResult(won) {
   const stats = loadStats();
   const s = stats[currentMode] || emptyStats();
+
+  // Daily mode: only record once per day to prevent double-counting
+  if (currentMode === 'daily') {
+    const today = new Date().toISOString().slice(0, 10);
+    if (s.lastPlayedDate === today) return;
+    s.lastPlayedDate = today;
+  }
+
   s.played++;
   if (won) {
     s.wins++;
