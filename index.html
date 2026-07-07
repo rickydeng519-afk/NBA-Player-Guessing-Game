@@ -9586,7 +9586,7 @@ const DUEL_QUESTIONS = [
   { key: 'fgPct',  label: 'Who has better FG%?',         format: v => `${(v*100).toFixed(1)}%`, icon: '🎯' },
   { key: 'fg3Pct', label: 'Who has better 3P%?',        format: v => `${(v*100).toFixed(1)}%`, icon: '🎯' },
   { key: 'ftPct',  label: 'Who has better FT%?',         format: v => `${(v*100).toFixed(1)}%`, icon: '🎯' },
-  { key: 'ht',   label: 'Who is taller?',              format: v => v,           icon: '📏' },
+  { key: 'ht',   label: 'Who is taller?',              format: v => `${Math.floor(v/12)}-${v%12}`, icon: '📏' },
   { key: 'age',  label: 'Who is older?',               format: v => `${v} yrs`,  icon: '🎂' },
 ];
 
@@ -9857,8 +9857,7 @@ function endDuel() {
   document.getElementById('duelCards').style.display = 'none';
   document.getElementById('duelQuestion').style.display = 'none';
   document.getElementById('duelTimerWrap').style.display = 'none';
-  document.getElementById('duelStartBtn').style.display = '';
-  document.getElementById('duelStartBtn').textContent = '🔄 Play Again';
+  document.getElementById('duelStartBtn').style.display = 'none';
   document.getElementById('duelResult').style.display = '';
   document.getElementById('duelFinalScore').textContent = duelState.score;
   document.getElementById('duelFinalCombo').textContent = duelState.maxCombo;
