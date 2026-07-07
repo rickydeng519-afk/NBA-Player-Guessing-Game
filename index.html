@@ -406,22 +406,89 @@ body.mode--2013 .share__btn--play-again:hover {
 /* ── Status Bar ──────────────────────────────────────────── */
 .status-bar {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  padding: 10px 4px;
-  font-size: 0.8rem;
-  color: var(--text-dim);
-  font-weight: 500;
+  gap: 6px;
+  padding: 12px 4px;
+  font-size: 0.85rem;
+  color: var(--text);
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 .status-bar__remaining {
-  font-weight: 700;
+  font-weight: 800;
   color: var(--text);
-  font-size: 1.1rem;
+  font-size: 1.3rem;
+  background: rgba(255,255,255,0.15);
+  padding: 2px 10px;
+  border-radius: 6px;
+  min-width: 28px;
+  text-align: center;
 }
 
 .status-bar__remaining[style] {
   /* preserve inline style overrides for danger/yellow */
+}
+
+/* ── Stats Panel ─────────────────────────────────────────── */
+.stats-panel {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+}
+
+.stats__summary {
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.stats__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stats__value {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-dark);
+}
+
+.stats__label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-dim-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 2px;
+}
+
+.stats__modes {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-dark);
+}
+
+.stats__mode {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-dim-dark);
+  padding: 4px 10px;
+  border-radius: 12px;
+  background: #f5f6f8;
+  transition: all 0.2s ease;
+}
+
+.stats__mode--active {
+  background: var(--accent);
+  color: #fff;
 }
 
 /* ── Game Over Overlay ───────────────────────────────────── */
@@ -595,12 +662,13 @@ body.mode--2013 .share__btn--play-again:hover {
   <!-- Header -->
   <header class="header">
     <h1 class="header__title">🏀 NBA Mystery Player</h1>
-    <p class="header__subtitle">Guess the hidden player — endless mode</p>
+    <p class="header__subtitle">New mystery every day · 每日挑战</p>
     <div class="mode-tabs">
-      <button id="modeCurrent" class="mode-tab mode-tab--active">🗽 群雄逐鹿</button>
+      <button id="modeDaily" class="mode-tab mode-tab--active">📅 每日挑战</button>
+      <button id="modeCurrent" class="mode-tab">🗽 群雄逐鹿</button>
       <button id="mode2013" class="mode-tab">👑 吾皇登基</button>
     </div>
-    <button id="newGameBtn" class="header__new-game">🔄 New Game</button>
+    <button id="newGameBtn" class="header__new-game" style="display:none">🔄 New Game</button>
   </header>
 
   <!-- Search -->
@@ -650,6 +718,9 @@ body.mode--2013 .share__btn--play-again:hover {
     <span class="status-bar__remaining" id="remaining">8</span>
     <span>/ 8</span>
   </div>
+
+  <!-- Stats Panel -->
+  <div id="statsPanel" class="stats-panel"></div>
 </div>
 
 <!-- Game Over Overlay -->
@@ -8447,10 +8518,120 @@ const PLAYERS_2013 = [
 const MAX_GUESSES = 8;
 const STORAGE_KEY = 'nbaMysteryPlayer';
 const COLUMNS = ['Team', 'Conf', 'Div', 'Pos', 'Ht', 'Age', '#'];
+const COMPARE_KEYS = ['team', 'conf', 'div', 'pos', 'ht', 'age', 'jersey'];
+const STATS_KEY = STORAGE_KEY + '_stats';
+
+// ── Stats ──────────────────────────────────────────────────
+function emptyStats() {
+  return { played: 0, wins: 0, totalGuesses: 0, streak: 0, maxStreak: 0 };
+}
+
+function loadStats() {
+  try {
+    const raw = localStorage.getItem(STATS_KEY);
+    if (raw) {
+      const data = JSON.parse(raw);
+      // Ensure all modes exist
+      for (const m of ['daily', 'current', '2013']) {
+        if (!data[m]) data[m] = emptyStats();
+      }
+      return data;
+    }
+  } catch (e) { /* ignore */ }
+  return { daily: emptyStats(), current: emptyStats(), '2013': emptyStats() };
+}
+
+function saveStats(stats) {
+  localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+}
+
+function recordGameResult(won) {
+  const stats = loadStats();
+  const s = stats[currentMode] || emptyStats();
+  s.played++;
+  if (won) {
+    s.wins++;
+    s.totalGuesses += guesses.length;
+    s.streak++;
+    if (s.streak > s.maxStreak) s.maxStreak = s.streak;
+  } else {
+    s.streak = 0;
+  }
+  stats[currentMode] = s;
+  saveStats(stats);
+  renderStats(stats);
+}
+
+function renderStats(stats) {
+  const panel = document.getElementById('statsPanel');
+  if (!panel) return;
+  const allStats = stats || loadStats();
+
+  // Totals across all modes
+  const total = { played: 0, wins: 0, totalGuesses: 0, streak: 0, maxStreak: 0 };
+  for (const m of ['daily', 'current', '2013']) {
+    const s = allStats[m];
+    total.played += s.played;
+    total.wins += s.wins;
+    total.totalGuesses += s.totalGuesses;
+    total.maxStreak = Math.max(total.maxStreak, s.maxStreak);
+  }
+  // Current streak is the sum of all mode streaks
+  total.streak = allStats.daily.streak + allStats.current.streak + allStats['2013'].streak;
+
+  const winPct = total.played > 0 ? Math.round(total.wins / total.played * 100) : 0;
+  const avgGuesses = total.wins > 0 ? (total.totalGuesses / total.wins).toFixed(1) : '-';
+
+  // Build mode-specific mini stats
+  const modeStats = [
+    { key: 'daily', label: '📅', s: allStats.daily },
+    { key: 'current', label: '🗽', s: allStats.current },
+    { key: '2013', label: '👑', s: allStats['2013'] },
+  ];
+
+  panel.innerHTML = `
+    <div class="stats__summary">
+      <div class="stats__item">
+        <span class="stats__value">${total.played}</span>
+        <span class="stats__label">Games</span>
+      </div>
+      <div class="stats__item">
+        <span class="stats__value">${winPct}%</span>
+        <span class="stats__label">Win%</span>
+      </div>
+      <div class="stats__item">
+        <span class="stats__value">${avgGuesses}</span>
+        <span class="stats__label">Avg</span>
+      </div>
+      <div class="stats__item">
+        <span class="stats__value">${total.maxStreak}</span>
+        <span class="stats__label">Best</span>
+      </div>
+    </div>
+    <div class="stats__modes">
+      ${modeStats.map(m => `
+        <span class="stats__mode ${m.key === currentMode ? 'stats__mode--active' : ''}"
+              title="${m.key === 'daily' ? '每日挑战' : m.key === 'current' ? '群雄逐鹿' : '吾皇登基'}">
+          ${m.label} ${m.s.wins}-${m.s.played - m.s.wins}
+        </span>
+      `).join('')}
+    </div>
+  `;
+}
 
 // ── Mode ───────────────────────────────────────────────────
 let PLAYERS = PLAYERS_CURRENT;
-let currentMode = 'current'; // 'current' | '2013'
+let currentMode = 'daily'; // 'daily' | 'current' | '2013'
+
+function hashDate() {
+  const today = new Date().toISOString().slice(0, 10);
+  let hash = 0;
+  for (let i = 0; i < today.length; i++) {
+    hash = ((hash << 5) - hash) + today.charCodeAt(i);
+    hash |= 0; // Convert to 32bit integer
+  }
+  return Math.abs(hash);
+}
 
 function switchMode(mode) {
   if (mode === currentMode) return;
@@ -8459,21 +8640,34 @@ function switchMode(mode) {
 
   // Toggle body class for theming
   document.body.classList.toggle('mode--2013', mode === '2013');
+  document.body.classList.toggle('mode--daily', mode === 'daily');
 
-  // Update subtitle
+  // Update subtitle based on mode
   const subtitle = document.querySelector('.header__subtitle');
+  const newGameBtn = document.getElementById('newGameBtn');
   if (subtitle) {
-    subtitle.textContent = mode === '2013'
-      ? '2012-13 Season · 吾皇登基'
-      : 'Current Season · 群雄逐鹿';
+    if (mode === 'daily') {
+      subtitle.textContent = 'New mystery every day · 每日挑战';
+    } else if (mode === '2013') {
+      subtitle.textContent = '2012-13 Season · 吾皇登基';
+    } else {
+      subtitle.textContent = 'Current Season · 群雄逐鹿';
+    }
   }
 
-  // Toggle active button
+  // Show/hide New Game button (hidden in daily mode)
+  if (newGameBtn) {
+    newGameBtn.style.display = mode === 'daily' ? 'none' : '';
+  }
+
+  // Toggle active buttons
+  document.getElementById('modeDaily')?.classList.toggle('mode-tab--active', mode === 'daily');
   document.getElementById('modeCurrent')?.classList.toggle('mode-tab--active', mode === 'current');
   document.getElementById('mode2013')?.classList.toggle('mode-tab--active', mode === '2013');
 
   resetGame();
-  console.log(`Switched to ${mode === '2013' ? '👑 吾皇登基 (2012-13)' : '🗽 群雄逐鹿 (current)'}`);
+  const labels = { daily: '📅 每日挑战', current: '🗽 群雄逐鹿', '2013': '👑 吾皇登基' };
+  console.log(`Switched to ${labels[mode]}`);
 }
 
 // ── State ──────────────────────────────────────────────────
@@ -8493,9 +8687,13 @@ const dom = {
   toast: null,
 };
 
-// ── Random Selection ───────────────────────────────────────
+// ── Player Selection ──────────────────────────────────────
 function getRandomIndex() {
   return Math.floor(Math.random() * PLAYERS.length);
+}
+
+function getDailyIndex() {
+  return hashDate() % PLAYERS.length;
 }
 
 // ── Init ───────────────────────────────────────────────────
@@ -8503,8 +8701,23 @@ function initGame() {
   cacheDom();
   loadState();
 
+  // Daily mode: check if date changed
+  if (currentMode === 'daily') {
+    const storedDate = localStorage.getItem(STORAGE_KEY + '_date');
+    const today = new Date().toISOString().slice(0, 10);
+    if (storedDate !== today) {
+      // New day — reset with fresh daily player
+      mysteryPlayer = null;
+      guesses = [];
+      gameOver = false;
+    }
+    // Hide New Game button in daily mode
+    const newGameBtn = document.getElementById('newGameBtn');
+    if (newGameBtn) newGameBtn.style.display = 'none';
+  }
+
   if (!mysteryPlayer) {
-    const idx = getRandomIndex();
+    const idx = currentMode === 'daily' ? getDailyIndex() : getRandomIndex();
     mysteryPlayer = PLAYERS[idx];
     guesses = [];
     gameOver = false;
@@ -8522,10 +8735,13 @@ function initGame() {
     dom.searchInput.placeholder = 'Game over';
   }
 
-  console.log(`Mystery player: ${mysteryPlayer.name} (#${mysteryPlayer.id})`);
+  console.log(`[${currentMode}] Mystery: ${mysteryPlayer.name} (#${mysteryPlayer.id})`);
 
   // Preload silhouette image in background
   preloadSilhouette();
+
+  // Render stats
+  renderStats();
 }
 
 function cacheDom() {
@@ -8541,15 +8757,16 @@ function cacheDom() {
 
 // ── State Persistence ──────────────────────────────────────
 function saveState() {
+  const today = new Date().toISOString().slice(0, 10);
   const state = {
-    date: new Date().toISOString().slice(0, 10),
+    date: today,
     mysteryId: mysteryPlayer ? mysteryPlayer.id : null,
     guesses: guesses,
     gameOver: gameOver,
     mode: currentMode,
   };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  localStorage.setItem(STORAGE_KEY + '_date', state.date);
+  localStorage.setItem(STORAGE_KEY + '_date', today);
 }
 
 function loadState() {
@@ -8557,15 +8774,36 @@ function loadState() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const state = JSON.parse(raw);
+      currentMode = state.mode || 'daily';
+
+      // Daily mode: clear if date changed
+      if (currentMode === 'daily') {
+        const today = new Date().toISOString().slice(0, 10);
+        if (state.date !== today) {
+          // New day — fresh start
+          guesses = [];
+          gameOver = false;
+          localStorage.setItem(STORAGE_KEY + '_date', today);
+          return;
+        }
+      }
+
       guesses = state.guesses || [];
       gameOver = state.gameOver || false;
-      currentMode = state.mode || 'current';
       PLAYERS = currentMode === '2013' ? PLAYERS_2013 : PLAYERS_CURRENT;
 
       // Restore mode UI
       document.body.classList.toggle('mode--2013', currentMode === '2013');
+      document.body.classList.toggle('mode--daily', currentMode === 'daily');
+      document.getElementById('modeDaily')?.classList.toggle('mode-tab--active', currentMode === 'daily');
       document.getElementById('modeCurrent')?.classList.toggle('mode-tab--active', currentMode === 'current');
       document.getElementById('mode2013')?.classList.toggle('mode-tab--active', currentMode === '2013');
+
+      // New Game button visibility
+      const newGameBtn = document.getElementById('newGameBtn');
+      if (newGameBtn) {
+        newGameBtn.style.display = currentMode === 'daily' ? 'none' : '';
+      }
 
       if (state.mysteryId !== null && state.mysteryId !== undefined) {
         mysteryPlayer = PLAYERS.find(p => p.id === state.mysteryId) || null;
@@ -8590,6 +8828,7 @@ function bindEvents() {
   document.getElementById('newGameBtn').addEventListener('click', resetGame);
 
   // Mode tabs
+  document.getElementById('modeDaily')?.addEventListener('click', () => switchMode('daily'));
   document.getElementById('modeCurrent')?.addEventListener('click', () => switchMode('current'));
   document.getElementById('mode2013')?.addEventListener('click', () => switchMode('2013'));
 
@@ -8708,25 +8947,25 @@ function selectPlayer(player) {
 
 // ── Comparison Engine ──────────────────────────────────────
 function compareTeam(guess, answer) {
-  if (guess.team === answer.team) return 'green';
-  if (answer.formerTeams.includes(guess.team)) return 'yellow';
-  return 'black';
+  if (guess.team === answer.team) return { color: 'green', arrow: '' };
+  if (answer.formerTeams.includes(guess.team)) return { color: 'yellow', arrow: '' };
+  return { color: 'black', arrow: '' };
 }
 
 function compareConf(guess, answer) {
-  return guess.conf === answer.conf ? 'green' : 'black';
+  return { color: guess.conf === answer.conf ? 'green' : 'black', arrow: '' };
 }
 
 function compareDiv(guess, answer) {
-  return guess.div === answer.div ? 'green' : 'black';
+  return { color: guess.div === answer.div ? 'green' : 'black', arrow: '' };
 }
 
 function comparePos(guess, answer) {
   const gSet = new Set(guess.pos);
   const aSet = new Set(answer.pos);
-  if (gSet.size === aSet.size && [...gSet].every(x => aSet.has(x))) return 'green';
-  if ([...gSet].some(x => aSet.has(x))) return 'yellow';
-  return 'black';
+  if (gSet.size === aSet.size && [...gSet].every(x => aSet.has(x))) return { color: 'green', arrow: '' };
+  if ([...gSet].some(x => aSet.has(x))) return { color: 'yellow', arrow: '' };
+  return { color: 'black', arrow: '' };
 }
 
 function compareNumeric(guessVal, answerVal) {
@@ -8794,16 +9033,9 @@ function addGuessRow(player) {
   cells.forEach(cell => {
     const td = document.createElement('td');
     const res = result[cell.key];
-
-    if (cell.key === 'ht' || cell.key === 'age' || cell.key === 'jersey') {
-      // Numeric columns: res is { color, arrow }
-      td.className = `cell--${res.color}`;
-      td.innerHTML = `${cell.display}<span class="cell-arrow">${res.arrow}</span>`;
-    } else {
-      // Text columns (team/conf/div/pos): res is a color string directly
-      td.className = `cell--${res}`;
-      td.textContent = cell.display;
-    }
+    // All columns now uniformly return { color, arrow }
+    td.className = `cell--${res.color}`;
+    td.innerHTML = `${cell.display}<span class="cell-arrow">${res.arrow || ''}</span>`;
     row.appendChild(td);
   });
 
@@ -8833,6 +9065,7 @@ function updateRemaining() {
 function endGame(won) {
   gameOver = true;
   saveState();
+  recordGameResult(won);
   dom.searchInput.disabled = true;
   dom.searchInput.placeholder = 'Game over';
 
@@ -8857,7 +9090,8 @@ function revealPlayerImage() {
 }
 
 function resetGame() {
-  const idx = getRandomIndex();
+  // Daily mode: always reset to the same daily player
+  const idx = currentMode === 'daily' ? getDailyIndex() : getRandomIndex();
   mysteryPlayer = PLAYERS[idx];
   guesses = [];
   gameOver = false;
@@ -8876,7 +9110,7 @@ function resetGame() {
   saveState();
   preloadSilhouette();
 
-  console.log(`New mystery player: ${mysteryPlayer.name} (#${mysteryPlayer.id})`);
+  console.log(`[${currentMode}] New mystery: ${mysteryPlayer.name} (#${mysteryPlayer.id})`);
 }
 
 function showOverlay(won) {
@@ -8903,17 +9137,24 @@ function showOverlay(won) {
 
 function generateShareGrid(won) {
   const date = new Date().toISOString().slice(0, 10);
-  const modeLabel = currentMode === '2013' ? '👑 吾皇登基 2012-13' : '🗽 群雄逐鹿';
-  let text = `${modeLabel} ${date}\n`;
+  const labels = {
+    daily: `📅 NBA Mystery Player ${date}`,
+    current: '🗽 群雄逐鹿',
+    '2013': '👑 吾皇登基 2012-13',
+  };
+  const modeLabel = labels[currentMode] || labels.daily;
+  let text = `${modeLabel} ${currentMode !== 'daily' ? date : ''}\n`.trim() + '\n';
+  if (currentMode === 'daily') {
+    // Date is already in the label for daily mode
+    text = `${modeLabel}\n`;
+  }
 
   guesses.forEach(g => {
     const result = compareAll(g, mysteryPlayer);
-    const emojis = [
-      result.team, result.conf, result.div, result.pos,
-      result.ht.color, result.age.color, result.jersey.color,
-    ].map(c => {
-      if (c === 'green' || (c.color === 'green')) return '🟩';
-      if (c === 'yellow' || (c.color === 'yellow')) return '🟨';
+    const emojis = COMPARE_KEYS.map(key => {
+      const c = result[key].color;
+      if (c === 'green') return '🟩';
+      if (c === 'yellow') return '🟨';
       return '⬛';
     }).join('');
     text += emojis + '\n';

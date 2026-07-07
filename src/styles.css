@@ -397,22 +397,89 @@ body.mode--2013 .share__btn--play-again:hover {
 /* ── Status Bar ──────────────────────────────────────────── */
 .status-bar {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  padding: 10px 4px;
-  font-size: 0.8rem;
-  color: var(--text-dim);
-  font-weight: 500;
+  gap: 6px;
+  padding: 12px 4px;
+  font-size: 0.85rem;
+  color: var(--text);
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 .status-bar__remaining {
-  font-weight: 700;
+  font-weight: 800;
   color: var(--text);
-  font-size: 1.1rem;
+  font-size: 1.3rem;
+  background: rgba(255,255,255,0.15);
+  padding: 2px 10px;
+  border-radius: 6px;
+  min-width: 28px;
+  text-align: center;
 }
 
 .status-bar__remaining[style] {
   /* preserve inline style overrides for danger/yellow */
+}
+
+/* ── Stats Panel ─────────────────────────────────────────── */
+.stats-panel {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+}
+
+.stats__summary {
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.stats__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stats__value {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-dark);
+}
+
+.stats__label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-dim-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 2px;
+}
+
+.stats__modes {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-dark);
+}
+
+.stats__mode {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-dim-dark);
+  padding: 4px 10px;
+  border-radius: 12px;
+  background: #f5f6f8;
+  transition: all 0.2s ease;
+}
+
+.stats__mode--active {
+  background: var(--accent);
+  color: #fff;
 }
 
 /* ── Game Over Overlay ───────────────────────────────────── */

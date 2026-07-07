@@ -37,12 +37,13 @@ html = f'''<!DOCTYPE html>
   <!-- Header -->
   <header class="header">
     <h1 class="header__title">🏀 NBA Mystery Player</h1>
-    <p class="header__subtitle">Guess the hidden player — endless mode</p>
+    <p class="header__subtitle">New mystery every day · 每日挑战</p>
     <div class="mode-tabs">
-      <button id="modeCurrent" class="mode-tab mode-tab--active">🗽 群雄逐鹿</button>
+      <button id="modeDaily" class="mode-tab mode-tab--active">📅 每日挑战</button>
+      <button id="modeCurrent" class="mode-tab">🗽 群雄逐鹿</button>
       <button id="mode2013" class="mode-tab">👑 吾皇登基</button>
     </div>
-    <button id="newGameBtn" class="header__new-game">🔄 New Game</button>
+    <button id="newGameBtn" class="header__new-game" style="display:none">🔄 New Game</button>
   </header>
 
   <!-- Search -->
@@ -92,6 +93,9 @@ html = f'''<!DOCTYPE html>
     <span class="status-bar__remaining" id="remaining">8</span>
     <span>/ 8</span>
   </div>
+
+  <!-- Stats Panel -->
+  <div id="statsPanel" class="stats-panel"></div>
 </div>
 
 <!-- Game Over Overlay -->
