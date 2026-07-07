@@ -42,12 +42,13 @@ html = f'''<!DOCTYPE html>
       <button id="modeDaily" class="mode-tab mode-tab--active">📅 每日挑战</button>
       <button id="modeCurrent" class="mode-tab">🗽 群雄逐鹿</button>
       <button id="mode2013" class="mode-tab">👑 吾皇登基</button>
+      <button id="modeDuel" class="mode-tab">⚡ 数据对决</button>
     </div>
     <button id="newGameBtn" class="header__new-game" style="display:none">🔄 New Game</button>
   </header>
 
   <!-- Search -->
-  <div class="search-wrapper">
+  <div class="search-wrapper" id="searchWrapper">
     <input
       type="text"
       id="searchInput"
@@ -62,7 +63,7 @@ html = f'''<!DOCTYPE html>
   </div>
 
   <!-- Silhouette Hint -->
-  <div class="silhouette">
+  <div class="silhouette" id="silhouetteWrap">
     <button id="silhouetteBtn" class="silhouette__btn">👤 Reveal Silhouette</button>
     <img id="silhouetteImg" class="silhouette__img"
          src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
@@ -96,6 +97,51 @@ html = f'''<!DOCTYPE html>
 
   <!-- Stats Panel -->
   <div id="statsPanel" class="stats-panel"></div>
+
+  <!-- Player Duel -->
+  <div id="duelContainer" class="duel" style="display:none">
+    <div class="duel__header">
+      <div class="duel__score">Score: <span id="duelScore">0</span></div>
+      <div class="duel__combo">🔥 <span id="duelCombo">0</span></div>
+      <div class="duel__lives" id="duelLives">❤️❤️❤️</div>
+    </div>
+    <div class="duel__best" id="duelBestScore">Best: 0</div>
+
+    <div class="duel__question" id="duelQuestion" style="display:none"></div>
+
+    <div class="duel__timer" id="duelTimerWrap" style="display:none">
+      <div class="duel__timer-bar" id="duelTimerBar"></div>
+    </div>
+
+    <div class="duel__cards" id="duelCards" style="display:none">
+      <div class="duel__card" id="duelCardA" onclick="handleDuelChoice('A')">
+        <img class="duel__card-img" id="duelImgA"
+             src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="">
+        <div class="duel__card-name" id="duelNameA"></div>
+        <div class="duel__card-team" id="duelTeamA"></div>
+        <div class="duel__card-stat" id="duelStatA" style="display:none"></div>
+      </div>
+      <div class="duel__vs">VS</div>
+      <div class="duel__card" id="duelCardB" onclick="handleDuelChoice('B')">
+        <img class="duel__card-img" id="duelImgB"
+             src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="">
+        <div class="duel__card-name" id="duelNameB"></div>
+        <div class="duel__card-team" id="duelTeamB"></div>
+        <div class="duel__card-stat" id="duelStatB" style="display:none"></div>
+      </div>
+    </div>
+
+    <button id="duelStartBtn" class="duel__start-btn" onclick="startDuel()">⚡ Start Duel</button>
+
+    <div id="duelResult" class="duel__result" style="display:none">
+      <div id="duelResultText" class="duel__result-text"></div>
+      <div class="duel__final-stats">
+        <div>Score: <span id="duelFinalScore">0</span></div>
+        <div>Best Combo: <span id="duelFinalCombo">0</span></div>
+      </div>
+      <button class="duel__start-btn" onclick="startDuel()">🔄 Play Again</button>
+    </div>
+  </div>
 </div>
 
 <!-- Game Over Overlay -->
