@@ -884,3 +884,266 @@ body.mode--duel .header__new-game {
   .duel__cards { gap: 4px; }
   .duel__vs { min-width: 20px; font-size: 0.65rem; }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   ROSTER RUSH — team player naming challenge
+   ═══════════════════════════════════════════════════════════ */
+
+.roster {
+  margin-bottom: 20px;
+}
+
+.roster__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 4px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.roster__score {
+  font-size: 1.1rem;
+  min-width: 80px;
+}
+
+.roster__timer {
+  font-size: 1.6rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  transition: color 0.3s ease;
+}
+
+.roster__timer--warning {
+  color: var(--yellow);
+  animation: pulse 0.8s ease-in-out infinite;
+}
+
+.roster__timer--danger {
+  color: var(--danger);
+  animation: pulse 0.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.roster__best {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  min-width: 70px;
+  text-align: right;
+}
+
+.roster__team {
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text);
+  padding: 10px 0 4px;
+  letter-spacing: 0.02em;
+}
+
+.roster__progress {
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  font-weight: 600;
+  padding-bottom: 14px;
+}
+
+.roster__progress span {
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.roster__search {
+  position: relative;
+  margin-bottom: 14px;
+}
+
+.roster__search-input {
+  width: 100%;
+  padding: 14px 18px;
+  background: var(--input-bg);
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  color: var(--text-dark);
+  font-size: 1rem;
+  font-family: var(--font);
+  outline: none;
+  transition: all 0.25s ease;
+  box-shadow: var(--shadow);
+}
+
+.roster__search-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(255,215,0,0.25);
+}
+
+.roster__search-input::placeholder {
+  color: var(--text-dim-dark);
+}
+
+.roster__dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 280px;
+  overflow-y: auto;
+  background: var(--card);
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius);
+  z-index: 100;
+  display: none;
+  box-shadow: var(--shadow-lg);
+}
+
+.roster__dropdown--open {
+  display: block;
+}
+
+.roster__dropdown-item {
+  padding: 12px 18px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  color: var(--text-dark);
+  transition: background 0.12s ease;
+  border-bottom: 1px solid #f2f4f6;
+}
+
+.roster__dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.roster__dropdown-item:hover {
+  background: #e8f0fe;
+  color: var(--accent-blue);
+}
+
+.roster__no-results {
+  padding: 16px;
+  text-align: center;
+  color: var(--text-dim-dark);
+  font-size: 0.85rem;
+}
+
+.roster__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+  min-height: 40px;
+}
+
+.roster__player-tag {
+  display: inline-block;
+  background: var(--card);
+  color: var(--text-dark);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+  animation: tagPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes tagPop {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.roster__start-btn {
+  display: block;
+  margin: 0 auto;
+  background: var(--accent);
+  border: none;
+  color: #fff;
+  padding: 14px 48px;
+  border-radius: 28px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-family: var(--font);
+  font-weight: 800;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 16px rgba(255,215,0,0.4);
+}
+
+.roster__start-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(255,215,0,0.5);
+}
+
+.roster__start-btn:active {
+  transform: scale(0.96);
+}
+
+.roster__result {
+  text-align: center;
+  color: var(--text);
+  padding: 16px 0;
+}
+
+.roster__result-text {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+/* Roster mode — body theme override */
+body.mode--roster {
+  --bg: #0d7b46;
+  --accent: #FFD700;
+}
+
+body.mode--roster .header__title {
+  color: var(--text);
+}
+
+body.mode--roster .mode-tab--active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #1a1a2e;
+}
+
+body.mode--roster .mode-tab--active:hover {
+  color: #1a1a2e;
+}
+
+body.mode--roster .header__new-game {
+  box-shadow: 0 2px 8px rgba(255,215,0,0.35);
+}
+
+body.mode--roster .roster__start-btn {
+  box-shadow: 0 4px 16px rgba(255,215,0,0.4);
+  color: #1a1a2e;
+}
+
+body.mode--roster .roster__start-btn:hover {
+  box-shadow: 0 6px 24px rgba(255,215,0,0.5);
+}
+
+/* Roster responsive */
+@media (max-width: 480px) {
+  .roster__team { font-size: 1.2rem; }
+  .roster__timer { font-size: 1.3rem; }
+  .roster__header { font-size: 0.85rem; }
+  .roster__search-input { font-size: 0.9rem; padding: 12px 14px; }
+  .roster__player-tag { font-size: 0.75rem; padding: 5px 10px; }
+  .roster__start-btn { padding: 12px 36px; font-size: 0.9rem; }
+}
+
+@media (max-width: 375px) {
+  .roster__team { font-size: 1.05rem; }
+  .roster__timer { font-size: 1.15rem; }
+  .roster__list { gap: 5px; }
+  .roster__player-tag { font-size: 0.7rem; padding: 4px 8px; }
+}

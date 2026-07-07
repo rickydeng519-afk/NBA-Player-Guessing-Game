@@ -43,6 +43,7 @@ html = f'''<!DOCTYPE html>
       <button id="modeCurrent" class="mode-tab">🗽 群雄逐鹿</button>
       <button id="mode2013" class="mode-tab">👑 吾皇登基</button>
       <button id="modeDuel" class="mode-tab">⚡ 数据对决</button>
+      <button id="modeRoster" class="mode-tab">🧩 球队拼图</button>
     </div>
     <button id="newGameBtn" class="header__new-game" style="display:none">🔄 New Game</button>
   </header>
@@ -140,6 +141,34 @@ html = f'''<!DOCTYPE html>
         <div>Best Combo: <span id="duelFinalCombo">0</span></div>
       </div>
       <button class="duel__start-btn" onclick="startDuel()">🔄 Play Again</button>
+    </div>
+  </div>
+
+  <!-- Roster Rush -->
+  <div id="rosterContainer" class="roster" style="display:none">
+    <div class="roster__header">
+      <div class="roster__score">Score: <span id="rosterScore">0</span></div>
+      <div class="roster__timer" id="rosterTimer">2:00</div>
+      <div class="roster__best" id="rosterBest">Best: 0</div>
+    </div>
+
+    <div class="roster__team" id="rosterTeamDisplay"></div>
+    <div class="roster__progress">Found: <span id="rosterFound">0</span> / <span id="rosterTotal">0</span></div>
+
+    <div class="roster__search" id="rosterSearchWrap" style="display:none">
+      <input type="text" id="rosterSearchInput" class="roster__search-input"
+             placeholder="🔍 Type a player name..." autocomplete="off"
+             autocorrect="off" autocapitalize="off" spellcheck="false">
+      <div id="rosterDropdown" class="roster__dropdown"></div>
+    </div>
+
+    <div class="roster__list" id="rosterList"></div>
+
+    <button id="rosterStartBtn" class="roster__start-btn" onclick="startRoster()">🧩 Start Roster Rush</button>
+
+    <div id="rosterResult" class="roster__result" style="display:none">
+      <div class="roster__result-text" id="rosterResultText"></div>
+      <button class="roster__start-btn" onclick="startRoster()">🔄 Play Again</button>
     </div>
   </div>
 </div>
