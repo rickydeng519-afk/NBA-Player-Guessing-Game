@@ -802,6 +802,7 @@ const duelState = {
   playing: false,
   answered: false,
   timerInterval: null,
+  barTimers: null,
   timeLeft: DUEL_TIME,
 };
 
@@ -924,8 +925,11 @@ function startDuelTimer() {
   bar.style.width = '0%';
 
   // Color changes at 5s and 3s
-  setTimeout(() => bar.classList.add('duel__timer-bar--warning'), (DUEL_TIME - 5) * 1000);
-  setTimeout(() => bar.classList.add('duel__timer-bar--danger'), (DUEL_TIME - 3) * 1000);
+  if (duelState.barTimers) duelState.barTimers.forEach(clearTimeout);
+  duelState.barTimers = [
+    setTimeout(() => bar.classList.add('duel__timer-bar--warning'), (DUEL_TIME - 5) * 1000),
+    setTimeout(() => bar.classList.add('duel__timer-bar--danger'), (DUEL_TIME - 3) * 1000),
+  ];
 
   if (duelState.timerInterval) clearInterval(duelState.timerInterval);
   duelState.timerInterval = setInterval(() => {
@@ -941,6 +945,7 @@ function handleDuelChoice(pickedSide) {
   if (!duelState.playing || duelState.answered) return;
   duelState.answered = true;
   clearInterval(duelState.timerInterval);
+  if (duelState.barTimers) { duelState.barTimers.forEach(clearTimeout); duelState.barTimers = null; }
 
   const a = duelState.playerA;
   const b = duelState.playerB;
@@ -958,12 +963,16 @@ function handleDuelChoice(pickedSide) {
   const isCorrect = pickedSide === correctSide;
 
   // Highlight cards
-  document.getElementById('duelCardA').classList.add(
-    correctSide === 'A' ? 'duel__card--correct' : (pickedSide === 'A' ? 'duel__card--wrong' : '')
-  );
-  document.getElementById('duelCardB').classList.add(
-    correctSide === 'B' ? 'duel__card--correct' : (pickedSide === 'B' ? 'duel__card--wrong' : '')
-  );
+  if (correctSide === 'A') {
+    document.getElementById('duelCardA').classList.add('duel__card--correct');
+  } else if (pickedSide === 'A') {
+    document.getElementById('duelCardA').classList.add('duel__card--wrong');
+  }
+  if (correctSide === 'B') {
+    document.getElementById('duelCardB').classList.add('duel__card--correct');
+  } else if (pickedSide === 'B') {
+    document.getElementById('duelCardB').classList.add('duel__card--wrong');
+  }
 
   if (pickedSide === 'A') document.getElementById('duelCardA').classList.add('duel__card--picked');
   if (pickedSide === 'B') document.getElementById('duelCardB').classList.add('duel__card--picked');
@@ -994,6 +1003,7 @@ function handleDuelChoice(pickedSide) {
 function handleDuelTimeout() {
   if (!duelState.playing || duelState.answered) return;
   duelState.answered = true;
+  if (duelState.barTimers) { duelState.barTimers.forEach(clearTimeout); duelState.barTimers = null; }
 
   const a = duelState.playerA;
   const b = duelState.playerB;
@@ -1043,6 +1053,7 @@ function nextDuelRound() {
 function endDuel() {
   duelState.playing = false;
   clearInterval(duelState.timerInterval);
+  if (duelState.barTimers) { duelState.barTimers.forEach(clearTimeout); duelState.barTimers = null; }
 
   document.getElementById('duelCards').style.display = 'none';
   document.getElementById('duelQuestion').style.display = 'none';
