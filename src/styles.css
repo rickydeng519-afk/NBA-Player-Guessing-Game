@@ -1028,6 +1028,12 @@ body.mode--duel .header__new-game {
   color: var(--accent-blue);
 }
 
+.roster__search-input--wrong {
+  border-color: var(--danger) !important;
+  background: #fff0f0 !important;
+  animation: shake 0.4s ease;
+}
+
 .roster__no-results {
   padding: 16px;
   text-align: center;

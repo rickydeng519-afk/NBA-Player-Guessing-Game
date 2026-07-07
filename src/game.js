@@ -1249,9 +1249,10 @@ function onRosterSearchInput() {
     return;
   }
 
-  // Filter: players from the selected team, not yet guessed
-  const results = rosterState.teamPlayers
-    .filter(p => !rosterState.guessed.some(g => g.id === p.id))
+  // Search ALL players (not just the target team), exclude already correctly guessed
+  const guessedIds = new Set(rosterState.guessed.map(g => g.id));
+  const results = PLAYERS_CURRENT
+    .filter(p => !guessedIds.has(p.id))
     .filter(p => normalizeStr(p.name).includes(normalizeStr(query)))
     .slice(0, 8);
 
@@ -1262,7 +1263,7 @@ function onRosterSearchInput() {
     results.forEach(p => {
       const div = document.createElement('div');
       div.className = 'roster__dropdown-item';
-      div.innerHTML = `<span>${escapeHtml(p.name)}</span><span class="search__item-team">${p.pos.join('-')}</span>`;
+      div.innerHTML = `<span>${escapeHtml(p.name)}</span><span class="search__item-team">${p.team} ${p.pos.join('-')}</span>`;
       div.addEventListener('mousedown', (e) => {
         e.preventDefault();
         submitRosterGuess(p);
@@ -1278,8 +1279,9 @@ function onRosterKeydown(e) {
     e.preventDefault();
     const query = document.getElementById('rosterSearchInput').value.trim().toLowerCase();
     if (!query) return;
-    const matches = rosterState.teamPlayers
-      .filter(p => !rosterState.guessed.some(g => g.id === p.id))
+    const guessedIds = new Set(rosterState.guessed.map(g => g.id));
+    const matches = PLAYERS_CURRENT
+      .filter(p => !guessedIds.has(p.id))
       .filter(p => normalizeStr(p.name).includes(normalizeStr(query)));
     if (matches.length === 1) {
       submitRosterGuess(matches[0]);
@@ -1294,29 +1296,42 @@ function onRosterKeydown(e) {
 function submitRosterGuess(player) {
   if (!rosterState.playing) return;
 
-  rosterState.guessed.push(player);
-  rosterState.score++;
+  const isCorrect = player.team === rosterState.team;
+  const input = document.getElementById('rosterSearchInput');
+  const dropdown = document.getElementById('rosterDropdown');
 
-  // Update display
-  document.getElementById('rosterScore').textContent = rosterState.score;
-  document.getElementById('rosterFound').textContent = rosterState.guessed.length;
-  document.getElementById('rosterSearchInput').value = '';
-  document.getElementById('rosterDropdown').classList.remove('roster__dropdown--open');
+  if (isCorrect) {
+    rosterState.guessed.push(player);
+    rosterState.score++;
 
-  // Add tag to list
-  const tag = document.createElement('span');
-  tag.className = 'roster__player-tag';
-  tag.textContent = player.name;
-  document.getElementById('rosterList').appendChild(tag);
+    // Update display
+    document.getElementById('rosterScore').textContent = rosterState.score;
+    document.getElementById('rosterFound').textContent = rosterState.guessed.length;
+    input.value = '';
+    dropdown.classList.remove('roster__dropdown--open');
 
-  // Check if all players found — early win
-  if (rosterState.guessed.length >= rosterState.teamPlayers.length) {
-    clearRosterTimer();
-    setTimeout(() => endRoster(), 400);
+    // Add green tag to list
+    const tag = document.createElement('span');
+    tag.className = 'roster__player-tag';
+    tag.textContent = player.name;
+    document.getElementById('rosterList').appendChild(tag);
+
+    // Check if all players found — early win
+    if (rosterState.guessed.length >= rosterState.teamPlayers.length) {
+      clearRosterTimer();
+      setTimeout(() => endRoster(), 400);
+    }
+
+    input.focus();
+  } else {
+    // Wrong team — shake input + show toast
+    input.classList.add('roster__search-input--wrong');
+    input.value = '';
+    dropdown.classList.remove('roster__dropdown--open');
+    showToast(`❌ ${player.name} is not on the ${TEAM_NAMES[rosterState.team] || rosterState.team}`);
+    setTimeout(() => input.classList.remove('roster__search-input--wrong'), 500);
+    input.focus();
   }
-
-  // Refocus search input
-  document.getElementById('rosterSearchInput').focus();
 }
 
 function endRoster() {
