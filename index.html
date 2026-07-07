@@ -10360,7 +10360,7 @@ function onRosterSearchInput() {
     results.forEach(p => {
       const div = document.createElement('div');
       div.className = 'roster__dropdown-item';
-      div.innerHTML = `<span>${escapeHtml(p.name)}</span><span class="search__item-team">${p.team} ${p.pos.join('-')}</span>`;
+      div.innerHTML = `<span>${escapeHtml(p.name)}</span><span class="search__item-team">${p.pos.join('-')}</span>`;
       div.addEventListener('mousedown', (e) => {
         e.preventDefault();
         submitRosterGuess(p);
