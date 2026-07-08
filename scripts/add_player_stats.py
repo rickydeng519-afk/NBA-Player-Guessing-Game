@@ -37,8 +37,16 @@ def fetch_stats():
     stats_by_id = {}
     for _, row in df.iterrows():
         pid = int(row['PLAYER_ID'])
-        stats_by_id[pid] = {field: round(row[api_field], 3) if 'PCT' in api_field else int(row[api_field])
-                           for api_field, field in STAT_FIELDS.items()}
+        s = {}
+        for api_field, field in STAT_FIELDS.items():
+            val = row[api_field]
+            if 'PCT' in api_field:
+                s[field] = round(val, 3)
+            elif api_field == 'GP':
+                s[field] = int(val)
+            else:
+                s[field] = round(val, 1)
+        stats_by_id[pid] = s
 
     print(f"  Fetched stats for {len(stats_by_id)} players")
     return stats_by_id
