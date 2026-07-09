@@ -1100,6 +1100,28 @@ body.mode--duel .header__new-game {
   transform: scale(0.96);
 }
 
+.roster__giveup-btn {
+  display: block;
+  margin: 8px auto 4px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.3);
+  color: rgba(255,255,255,0.8);
+  padding: 8px 24px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-family: var(--font);
+  font-weight: 600;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.03em;
+}
+
+.roster__giveup-btn:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.5);
+  color: #fff;
+}
+
 .roster__result {
   text-align: center;
   color: var(--text);
@@ -1249,7 +1271,7 @@ body.mode--roster .roster__start-btn:hover {
     </div>
 
     <div class="duel__cards" id="duelCards" style="display:none">
-      <div class="duel__card" id="duelCardA" onclick="handleDuelChoice('A')">
+      <div class="duel__card" id="duelCardA">
         <img class="duel__card-img" id="duelImgA"
              src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="">
         <div class="duel__card-name" id="duelNameA"></div>
@@ -1257,7 +1279,7 @@ body.mode--roster .roster__start-btn:hover {
         <div class="duel__card-stat" id="duelStatA" style="display:none"></div>
       </div>
       <div class="duel__vs">VS</div>
-      <div class="duel__card" id="duelCardB" onclick="handleDuelChoice('B')">
+      <div class="duel__card" id="duelCardB">
         <img class="duel__card-img" id="duelImgB"
              src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="">
         <div class="duel__card-name" id="duelNameB"></div>
@@ -1266,7 +1288,7 @@ body.mode--roster .roster__start-btn:hover {
       </div>
     </div>
 
-    <button id="duelStartBtn" class="duel__start-btn" onclick="startDuel()">⚡ Start Duel</button>
+    <button id="duelStartBtn" class="duel__start-btn">⚡ Start Duel</button>
 
     <div id="duelResult" class="duel__result" style="display:none">
       <div id="duelResultText" class="duel__result-text"></div>
@@ -1274,7 +1296,7 @@ body.mode--roster .roster__start-btn:hover {
         <div>Score: <span id="duelFinalScore">0</span></div>
         <div>Best Combo: <span id="duelFinalCombo">0</span></div>
       </div>
-      <button class="duel__start-btn" onclick="startDuel()">🔄 Play Again</button>
+      <button class="duel__start-btn" id="duelPlayAgainBtn">🔄 Play Again</button>
     </div>
   </div>
 
@@ -1298,11 +1320,12 @@ body.mode--roster .roster__start-btn:hover {
 
     <div class="roster__list" id="rosterList"></div>
 
-    <button id="rosterStartBtn" class="roster__start-btn" onclick="startRoster()">🧩 Start Roster Rush</button>
+    <button id="rosterGiveUpBtn" class="roster__giveup-btn" style="display:none">🏳️ Give Up · Record Score</button>
+    <button id="rosterStartBtn" class="roster__start-btn">🧩 Start Roster Rush</button>
 
     <div id="rosterResult" class="roster__result" style="display:none">
       <div class="roster__result-text" id="rosterResultText"></div>
-      <button class="roster__start-btn" onclick="startRoster()">🔄 Play Again</button>
+      <button class="roster__start-btn" id="rosterPlayAgainBtn">🔄 Play Again</button>
     </div>
   </div>
 </div>
@@ -9094,10 +9117,644 @@ const PLAYERS_2013 = [
 
 
 // ═══════════════════════════════════════════════════════════════
-// GAME LOGIC
+// PLAYER DUEL MODULE
+// ═══════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════
+   PLAYER DUEL MODE — compare per-game stats side-by-side
+   ═══════════════════════════════════════════════════════════════ */
+
+const DUEL_TIME = 15;
+const DUEL_LIVES = 3;
+
+const DUEL_QUESTIONS = [
+  { key: 'pts',  label: 'Who scores more?',           format: v => `${v.toFixed(1)} PPG`,   icon: '🏀' },
+  { key: 'reb',  label: 'Who grabs more rebounds?',    format: v => `${v.toFixed(1)} RPG`,   icon: '💪' },
+  { key: 'ast',  label: 'Who dishes more assists?',    format: v => `${v.toFixed(1)} APG`,   icon: '🤝' },
+  { key: 'stl',  label: 'Who gets more steals?',       format: v => `${v.toFixed(1)} SPG`,   icon: '🫳' },
+  { key: 'blk',  label: 'Who blocks more shots?',       format: v => `${v.toFixed(1)} BPG`,   icon: '✋' },
+  { key: 'tov',  label: 'Who turns the ball over MORE?', format: v => `${v.toFixed(1)} TOV`,  icon: '😬' },
+  { key: 'fgPct',  label: 'Who has better FG%?',         format: v => `${(v*100).toFixed(1)}%`, icon: '🎯' },
+  { key: 'fg3Pct', label: 'Who has better 3P%?',        format: v => `${(v*100).toFixed(1)}%`, icon: '🎯' },
+  { key: 'ftPct',  label: 'Who has better FT%?',         format: v => `${(v*100).toFixed(1)}%`, icon: '🎯' },
+  { key: 'ht',   label: 'Who is taller?',              format: v => `${Math.floor(v/12)}-${v%12}`, icon: '📏' },
+  { key: 'age',  label: 'Who is older?',               format: v => `${v} yrs`,  icon: '🎂' },
+];
+
+const duelState = {
+  score: 0,
+  combo: 0,
+  maxCombo: 0,
+  lives: DUEL_LIVES,
+  playerA: null,
+  playerB: null,
+  question: null,
+  playing: false,
+  answered: false,
+  timerInterval: null,
+  barTimers: null,
+  timeLeft: DUEL_TIME,
+};
+
+function getDuelPool() {
+  return PLAYERS_CURRENT.filter(p => p.stats && p.stats.gp > 0 && p.stats.pts > 0);
+}
+
+function pickDuelPair() {
+  const pool = getDuelPool();
+  if (pool.length < 2) return [null, null];
+  const a = pool[Math.floor(Math.random() * pool.length)];
+  let b;
+  do { b = pool[Math.floor(Math.random() * pool.length)]; } while (b.id === a.id);
+  return [a, b];
+}
+
+function pickDuelQuestion(a, b) {
+  const shuffled = [...DUEL_QUESTIONS].sort(() => Math.random() - 0.5);
+  for (const q of shuffled) {
+    const va = getDuelStat(a, q.key);
+    const vb = getDuelStat(b, q.key);
+    if (va !== vb) return q;
+  }
+  return shuffled[0];
+}
+
+function getDuelStat(player, key) {
+  if (key === 'ht') return player.htInches;
+  if (key === 'age') return player.age;
+  return player.stats ? player.stats[key] : 0;
+}
+
+function showDuelUI() {
+  document.body.classList.add('mode--duel');
+  document.getElementById('duelContainer').style.display = '';
+  document.getElementById('searchWrapper').style.display = 'none';
+  document.getElementById('silhouetteWrap').style.display = 'none';
+  document.querySelector('.guess-table').style.display = 'none';
+  document.querySelector('.status-bar').style.display = 'none';
+  document.getElementById('statsPanel').style.display = 'none';
+}
+
+function hideDuelUI() {
+  document.body.classList.remove('mode--duel');
+  document.getElementById('duelContainer').style.display = 'none';
+  document.getElementById('searchWrapper').style.display = '';
+  document.getElementById('silhouetteWrap').style.display = '';
+  document.querySelector('.guess-table').style.display = '';
+  document.querySelector('.status-bar').style.display = '';
+  document.getElementById('statsPanel').style.display = '';
+}
+
+function startDuel() {
+  const [a, b] = pickDuelPair();
+  if (!a || !b) return;
+
+  duelState.playerA = a;
+  duelState.playerB = b;
+  duelState.question = pickDuelQuestion(a, b);
+  duelState.score = 0;
+  duelState.combo = 0;
+  duelState.maxCombo = 0;
+  duelState.lives = DUEL_LIVES;
+  duelState.playing = true;
+  duelState.answered = false;
+
+  document.getElementById('duelStartBtn').style.display = 'none';
+  document.getElementById('duelResult').style.display = 'none';
+  document.getElementById('duelCards').style.display = '';
+  document.getElementById('duelQuestion').style.display = '';
+  document.getElementById('duelTimerWrap').style.display = '';
+  document.getElementById('duelCardA').classList.remove('duel__card--correct', 'duel__card--wrong', 'duel__card--picked');
+  document.getElementById('duelCardB').classList.remove('duel__card--correct', 'duel__card--wrong', 'duel__card--picked');
+  document.getElementById('duelStatA').style.display = 'none';
+  document.getElementById('duelStatB').style.display = 'none';
+
+  updateDuelUI();
+  startDuelTimer();
+}
+
+function updateDuelUI() {
+  const a = duelState.playerA;
+  const b = duelState.playerB;
+  if (!a || !b) return;
+
+  document.getElementById('duelQuestion').textContent =
+    `${duelState.question.icon} ${duelState.question.label}`;
+  document.getElementById('duelScore').textContent = duelState.score;
+  document.getElementById('duelCombo').textContent = duelState.combo;
+  document.getElementById('duelLives').textContent =
+    '❤️'.repeat(duelState.lives) + '🖤'.repeat(DUEL_LIVES - duelState.lives);
+
+  // Card A
+  document.getElementById('duelImgA').src = a.nbaId
+    ? `https://cdn.nba.com/headshots/nba/latest/260x190/${a.nbaId}.png`
+    : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+  document.getElementById('duelNameA').textContent = a.name;
+  document.getElementById('duelTeamA').textContent = `${a.team} | ${a.pos.join('-')}`;
+
+  // Card B
+  document.getElementById('duelImgB').src = b.nbaId
+    ? `https://cdn.nba.com/headshots/nba/latest/260x190/${b.nbaId}.png`
+    : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+  document.getElementById('duelNameB').textContent = b.name;
+  document.getElementById('duelTeamB').textContent = `${b.team} | ${b.pos.join('-')}`;
+}
+
+function startDuelTimer() {
+  duelState.timeLeft = DUEL_TIME;
+  duelState.answered = false;
+  const bar = document.getElementById('duelTimerBar');
+  bar.style.transition = 'none';
+  bar.style.width = '100%';
+  bar.classList.remove('duel__timer-bar--warning', 'duel__timer-bar--danger');
+
+  // Force reflow
+  bar.offsetHeight;
+
+  bar.style.transition = `width ${DUEL_TIME}s linear`;
+  bar.style.width = '0%';
+
+  // Color changes at 5s and 3s
+  if (duelState.barTimers) duelState.barTimers.forEach(clearTimeout);
+  duelState.barTimers = [
+    setTimeout(() => bar.classList.add('duel__timer-bar--warning'), (DUEL_TIME - 5) * 1000),
+    setTimeout(() => bar.classList.add('duel__timer-bar--danger'), (DUEL_TIME - 3) * 1000),
+  ];
+
+  if (duelState.timerInterval) clearInterval(duelState.timerInterval);
+  duelState.timerInterval = setInterval(() => {
+    duelState.timeLeft--;
+    if (duelState.timeLeft <= 0) {
+      clearInterval(duelState.timerInterval);
+      if (!duelState.answered) handleDuelTimeout();
+    }
+  }, 1000);
+}
+
+function handleDuelChoice(pickedSide) {
+  if (!duelState.playing || duelState.answered) return;
+  duelState.answered = true;
+  clearInterval(duelState.timerInterval);
+  if (duelState.barTimers) { duelState.barTimers.forEach(clearTimeout); duelState.barTimers = null; }
+
+  const a = duelState.playerA;
+  const b = duelState.playerB;
+  const q = duelState.question;
+  const valA = getDuelStat(a, q.key);
+  const valB = getDuelStat(b, q.key);
+
+  // Show stats
+  document.getElementById('duelStatA').textContent = q.format(valA);
+  document.getElementById('duelStatA').style.display = '';
+  document.getElementById('duelStatB').textContent = q.format(valB);
+  document.getElementById('duelStatB').style.display = '';
+
+  const correctSide = valA > valB ? 'A' : 'B';
+  const isCorrect = pickedSide === correctSide;
+
+  // Highlight cards
+  if (correctSide === 'A') {
+    document.getElementById('duelCardA').classList.add('duel__card--correct');
+  } else if (pickedSide === 'A') {
+    document.getElementById('duelCardA').classList.add('duel__card--wrong');
+  }
+  if (correctSide === 'B') {
+    document.getElementById('duelCardB').classList.add('duel__card--correct');
+  } else if (pickedSide === 'B') {
+    document.getElementById('duelCardB').classList.add('duel__card--wrong');
+  }
+
+  if (pickedSide === 'A') document.getElementById('duelCardA').classList.add('duel__card--picked');
+  if (pickedSide === 'B') document.getElementById('duelCardB').classList.add('duel__card--picked');
+
+  if (isCorrect) {
+    duelState.score++;
+    duelState.combo++;
+    if (duelState.combo > duelState.maxCombo) duelState.maxCombo = duelState.combo;
+    document.getElementById('duelResultText').textContent = '✅ Correct!';
+  } else {
+    duelState.combo = 0;
+    duelState.lives--;
+    document.getElementById('duelResultText').textContent = '❌ Wrong!';
+  }
+
+  updateDuelUI();
+
+  // Next round or game over
+  setTimeout(() => {
+    if (duelState.lives <= 0) {
+      endDuel();
+    } else {
+      nextDuelRound();
+    }
+  }, 1500);
+}
+
+function handleDuelTimeout() {
+  if (!duelState.playing || duelState.answered) return;
+  duelState.answered = true;
+  if (duelState.barTimers) { duelState.barTimers.forEach(clearTimeout); duelState.barTimers = null; }
+
+  const a = duelState.playerA;
+  const b = duelState.playerB;
+  const q = duelState.question;
+  const valA = getDuelStat(a, q.key);
+  const valB = getDuelStat(b, q.key);
+
+  document.getElementById('duelStatA').textContent = q.format(valA);
+  document.getElementById('duelStatA').style.display = '';
+  document.getElementById('duelStatB').textContent = q.format(valB);
+  document.getElementById('duelStatB').style.display = '';
+
+  duelState.combo = 0;
+  duelState.lives--;
+  document.getElementById('duelResultText').textContent = '⏰ Time\'s up!';
+
+  updateDuelUI();
+
+  setTimeout(() => {
+    if (duelState.lives <= 0) {
+      endDuel();
+    } else {
+      nextDuelRound();
+    }
+  }, 1500);
+}
+
+function nextDuelRound() {
+  const [a, b] = pickDuelPair();
+  if (!a || !b) { endDuel(); return; }
+
+  duelState.playerA = a;
+  duelState.playerB = b;
+  duelState.question = pickDuelQuestion(a, b);
+  duelState.answered = false;
+
+  document.getElementById('duelCardA').classList.remove('duel__card--correct', 'duel__card--wrong', 'duel__card--picked');
+  document.getElementById('duelCardB').classList.remove('duel__card--correct', 'duel__card--wrong', 'duel__card--picked');
+  document.getElementById('duelStatA').style.display = 'none';
+  document.getElementById('duelStatB').style.display = 'none';
+  document.getElementById('duelResultText').textContent = '';
+
+  updateDuelUI();
+  startDuelTimer();
+}
+
+function endDuel() {
+  duelState.playing = false;
+  clearInterval(duelState.timerInterval);
+  if (duelState.barTimers) { duelState.barTimers.forEach(clearTimeout); duelState.barTimers = null; }
+
+  document.getElementById('duelCards').style.display = 'none';
+  document.getElementById('duelQuestion').style.display = 'none';
+  document.getElementById('duelTimerWrap').style.display = 'none';
+  document.getElementById('duelStartBtn').style.display = 'none';
+  document.getElementById('duelResult').style.display = '';
+  document.getElementById('duelFinalScore').textContent = duelState.score;
+  document.getElementById('duelFinalCombo').textContent = duelState.maxCombo;
+
+  saveDuelBest();
+}
+
+function saveDuelBest() {
+  try {
+    const key = STORAGE_KEY + '_duelBest';
+    const prev = parseInt(localStorage.getItem(key) || '0', 10);
+    if (duelState.score > prev) {
+      localStorage.setItem(key, String(duelState.score));
+    }
+    document.getElementById('duelBestScore').textContent =
+      `Best: ${Math.max(prev, duelState.score)}`;
+  } catch (e) { /* ignore */ }
+}
+
+// ── Duel Event Bindings ─────────────────────────────────────
+function bindDuelEvents() {
+  // Card click listeners (replace inline onclick)
+  const cardA = document.getElementById('duelCardA');
+  const cardB = document.getElementById('duelCardB');
+  if (cardA) cardA.addEventListener('click', () => handleDuelChoice('A'));
+  if (cardB) cardB.addEventListener('click', () => handleDuelChoice('B'));
+
+  // Start / Play Again buttons (replace inline onclick)
+  const startBtn = document.getElementById('duelStartBtn');
+  if (startBtn) startBtn.addEventListener('click', startDuel);
+
+  // Play Again button in result section
+  const resultPlayAgain = document.querySelector('#duelResult .duel__start-btn');
+  if (resultPlayAgain) resultPlayAgain.addEventListener('click', startDuel);
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// ROSTER RUSH MODULE
+// ═══════════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════════
+   ROSTER RUSH — name all players from a team in 2 minutes
+   ═══════════════════════════════════════════════════════════════ */
+
+const ROSTER_TIME = 120; // 2 minutes
+
+const TEAM_NAMES = {
+  'ATL': 'Atlanta Hawks',      'BOS': 'Boston Celtics',
+  'BKN': 'Brooklyn Nets',      'CHA': 'Charlotte Hornets',
+  'CHI': 'Chicago Bulls',      'CLE': 'Cleveland Cavaliers',
+  'DAL': 'Dallas Mavericks',   'DEN': 'Denver Nuggets',
+  'DET': 'Detroit Pistons',    'GSW': 'Golden State Warriors',
+  'HOU': 'Houston Rockets',    'IND': 'Indiana Pacers',
+  'LAC': 'LA Clippers',        'LAL': 'Los Angeles Lakers',
+  'MEM': 'Memphis Grizzlies',  'MIA': 'Miami Heat',
+  'MIL': 'Milwaukee Bucks',    'MIN': 'Minnesota Timberwolves',
+  'NOP': 'New Orleans Pelicans','NYK': 'New York Knicks',
+  'OKC': 'Oklahoma City Thunder','ORL': 'Orlando Magic',
+  'PHI': 'Philadelphia 76ers', 'PHX': 'Phoenix Suns',
+  'POR': 'Portland Trail Blazers','SAC': 'Sacramento Kings',
+  'SAS': 'San Antonio Spurs',  'TOR': 'Toronto Raptors',
+  'UTA': 'Utah Jazz',          'WAS': 'Washington Wizards',
+};
+
+const rosterState = {
+  team: null,
+  teamPlayers: [],
+  guessed: [],
+  score: 0,
+  playing: false,
+  timerInterval: null,
+  timeLeft: ROSTER_TIME,
+};
+
+function showRosterUI() {
+  document.body.classList.add('mode--roster');
+  document.getElementById('rosterContainer').style.display = '';
+  document.getElementById('searchWrapper').style.display = 'none';
+  document.getElementById('silhouetteWrap').style.display = 'none';
+  document.querySelector('.guess-table').style.display = 'none';
+  document.querySelector('.status-bar').style.display = 'none';
+  document.getElementById('statsPanel').style.display = 'none';
+}
+
+function hideRosterUI() {
+  clearRosterTimer();
+  rosterState.playing = false;
+
+  // Reset roster UI to initial state so switching back shows the start screen
+  document.getElementById('rosterStartBtn').style.display = '';
+  document.getElementById('rosterResult').style.display = 'none';
+  document.getElementById('rosterSearchWrap').style.display = 'none';
+  document.getElementById('rosterList').innerHTML = '';
+  document.getElementById('rosterTimer').classList.remove('roster__timer--warning', 'roster__timer--danger');
+  document.getElementById('rosterTimer').textContent = '2:00';
+  document.getElementById('rosterGiveUpBtn').style.display = 'none';
+
+  // If the user was mid-game, record whatever score they had before abandoning
+  if (rosterState.score > 0) {
+    saveRosterBest();
+    rosterState.score = 0;
+    rosterState.guessed = [];
+  }
+
+  document.body.classList.remove('mode--roster');
+  document.getElementById('rosterContainer').style.display = 'none';
+  document.getElementById('searchWrapper').style.display = '';
+  document.getElementById('silhouetteWrap').style.display = '';
+  document.querySelector('.guess-table').style.display = '';
+  document.querySelector('.status-bar').style.display = '';
+  document.getElementById('statsPanel').style.display = '';
+}
+
+function clearRosterTimer() {
+  if (rosterState.timerInterval) {
+    clearInterval(rosterState.timerInterval);
+    rosterState.timerInterval = null;
+  }
+}
+
+function startRoster() {
+  clearRosterTimer();
+
+  // Pick random team with >= 8 players
+  const teams = [...new Set(PLAYERS_CURRENT.map(p => p.team))];
+  const viable = teams.filter(t => {
+    const count = PLAYERS_CURRENT.filter(p => p.team === t).length;
+    return count >= 8;
+  });
+  if (viable.length === 0) return;
+  const team = viable[Math.floor(Math.random() * viable.length)];
+  const teamPlayers = PLAYERS_CURRENT.filter(p => p.team === team);
+
+  rosterState.team = team;
+  rosterState.teamPlayers = teamPlayers;
+  rosterState.guessed = [];
+  rosterState.score = 0;
+  rosterState.playing = true;
+  rosterState.timeLeft = ROSTER_TIME;
+
+  // Reset UI
+  document.getElementById('rosterStartBtn').style.display = 'none';
+  document.getElementById('rosterResult').style.display = 'none';
+  document.getElementById('rosterSearchWrap').style.display = '';
+  document.getElementById('rosterGiveUpBtn').style.display = '';
+  document.getElementById('rosterTeamDisplay').textContent = TEAM_NAMES[team] || team;
+  document.getElementById('rosterScore').textContent = '0';
+  document.getElementById('rosterFound').textContent = '0';
+  document.getElementById('rosterTotal').textContent = teamPlayers.length;
+  document.getElementById('rosterList').innerHTML = '';
+  document.getElementById('rosterSearchInput').value = '';
+  document.getElementById('rosterTimer').classList.remove('roster__timer--warning', 'roster__timer--danger');
+
+  updateRosterTimerDisplay();
+  startRosterTimer();
+
+  // Focus search
+  setTimeout(() => document.getElementById('rosterSearchInput').focus(), 100);
+}
+
+function updateRosterTimerDisplay() {
+  const mins = Math.floor(rosterState.timeLeft / 60);
+  const secs = rosterState.timeLeft % 60;
+  const el = document.getElementById('rosterTimer');
+  el.textContent = `${mins}:${String(secs).padStart(2, '0')}`;
+
+  if (rosterState.timeLeft <= 30) el.classList.add('roster__timer--warning');
+  if (rosterState.timeLeft <= 10) {
+    el.classList.remove('roster__timer--warning');
+    el.classList.add('roster__timer--danger');
+  }
+}
+
+function startRosterTimer() {
+  clearRosterTimer();
+  rosterState.timerInterval = setInterval(() => {
+    rosterState.timeLeft--;
+    updateRosterTimerDisplay();
+    if (rosterState.timeLeft <= 0) {
+      clearRosterTimer();
+      endRoster();
+    }
+  }, 1000);
+}
+
+function onRosterSearchInput() {
+  const query = document.getElementById('rosterSearchInput').value.trim().toLowerCase();
+  const dropdown = document.getElementById('rosterDropdown');
+  if (!dropdown) return;
+
+  if (!query || !rosterState.playing) {
+    dropdown.classList.remove('roster__dropdown--open');
+    return;
+  }
+
+  // Search ALL players (not just the target team), exclude already correctly guessed
+  const guessedIds = new Set(rosterState.guessed.map(g => g.id));
+  const results = PLAYERS_CURRENT
+    .filter(p => !guessedIds.has(p.id))
+    .filter(p => normalizeStr(p.name).includes(normalizeStr(query)))
+    .slice(0, 8);
+
+  dropdown.innerHTML = '';
+  if (results.length === 0) {
+    dropdown.innerHTML = '<div class="roster__no-results">No matching players</div>';
+  } else {
+    results.forEach(p => {
+      const div = document.createElement('div');
+      div.className = 'roster__dropdown-item';
+      div.innerHTML = `<span>${escapeHtml(p.name)}</span><span class="search__item-team">${p.pos.join('-')}</span>`;
+      div.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        submitRosterGuess(p);
+      });
+      dropdown.appendChild(div);
+    });
+  }
+  dropdown.classList.add('roster__dropdown--open');
+}
+
+function onRosterKeydown(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    const query = document.getElementById('rosterSearchInput').value.trim().toLowerCase();
+    if (!query) return;
+    const guessedIds = new Set(rosterState.guessed.map(g => g.id));
+    const matches = PLAYERS_CURRENT
+      .filter(p => !guessedIds.has(p.id))
+      .filter(p => normalizeStr(p.name).includes(normalizeStr(query)));
+    if (matches.length === 1) {
+      submitRosterGuess(matches[0]);
+    }
+  } else if (e.key === 'Escape') {
+    const dropdown = document.getElementById('rosterDropdown');
+    if (dropdown) dropdown.classList.remove('roster__dropdown--open');
+    document.getElementById('rosterSearchInput').blur();
+  }
+}
+
+function submitRosterGuess(player) {
+  if (!rosterState.playing) return;
+
+  const isCorrect = player.team === rosterState.team;
+  const input = document.getElementById('rosterSearchInput');
+  const dropdown = document.getElementById('rosterDropdown');
+
+  if (isCorrect) {
+    rosterState.guessed.push(player);
+    rosterState.score++;
+
+    // Update display
+    document.getElementById('rosterScore').textContent = rosterState.score;
+    document.getElementById('rosterFound').textContent = rosterState.guessed.length;
+    input.value = '';
+    dropdown.classList.remove('roster__dropdown--open');
+
+    // Add green tag to list
+    const tag = document.createElement('span');
+    tag.className = 'roster__player-tag';
+    tag.textContent = player.name;
+    document.getElementById('rosterList').appendChild(tag);
+
+    // Check if all players found — early win
+    if (rosterState.guessed.length >= rosterState.teamPlayers.length) {
+      clearRosterTimer();
+      setTimeout(() => endRoster(), 400);
+    }
+
+    input.focus();
+  } else {
+    // Wrong team — shake input + show toast
+    input.classList.add('roster__search-input--wrong');
+    input.value = '';
+    dropdown.classList.remove('roster__dropdown--open');
+    showToast(`❌ ${player.name} is not on the ${TEAM_NAMES[rosterState.team] || rosterState.team}`);
+    setTimeout(() => input.classList.remove('roster__search-input--wrong'), 500);
+    input.focus();
+  }
+}
+
+function giveUpRoster() {
+  if (!rosterState.playing) return;
+  clearRosterTimer();
+  endRoster();
+}
+
+function endRoster() {
+  rosterState.playing = false;
+  clearRosterTimer();
+
+  document.getElementById('rosterSearchWrap').style.display = 'none';
+  document.getElementById('rosterGiveUpBtn').style.display = 'none';
+  document.getElementById('rosterResult').style.display = '';
+
+  const total = rosterState.teamPlayers.length;
+  const pct = total > 0 ? Math.round(rosterState.score / total * 100) : 0;
+
+  let emoji = '🏆';
+  if (pct < 75) emoji = '⭐';
+  if (pct < 50) emoji = '💪';
+  if (pct < 25) emoji = '📋';
+
+  const teamName = TEAM_NAMES[rosterState.team] || rosterState.team;
+  document.getElementById('rosterResultText').innerHTML =
+    `${emoji} ${teamName}<br>You named <strong>${rosterState.score}</strong> of <strong>${total}</strong> players (${pct}%)`;
+
+  saveRosterBest();
+}
+
+function saveRosterBest() {
+  try {
+    const key = STORAGE_KEY + '_rosterBest';
+    const prev = parseInt(localStorage.getItem(key) || '0', 10);
+    if (rosterState.score > prev) {
+      localStorage.setItem(key, String(rosterState.score));
+    }
+    document.getElementById('rosterBest').textContent =
+      `Best: ${Math.max(prev, rosterState.score)}`;
+  } catch (e) { /* ignore */ }
+}
+
+// ── Roster Event Bindings ───────────────────────────────────
+function bindRosterEvents() {
+  // Search input events
+  const input = document.getElementById('rosterSearchInput');
+  if (input) {
+    input.addEventListener('input', onRosterSearchInput);
+    input.addEventListener('keydown', onRosterKeydown);
+  }
+
+  // Start / Play Again / Give Up buttons
+  const startBtn = document.getElementById('rosterStartBtn');
+  if (startBtn) startBtn.addEventListener('click', startRoster);
+
+  const resultPlayAgain = document.querySelector('#rosterResult .roster__start-btn');
+  if (resultPlayAgain) resultPlayAgain.addEventListener('click', startRoster);
+
+  const giveUpBtn = document.getElementById('rosterGiveUpBtn');
+  if (giveUpBtn) giveUpBtn.addEventListener('click', giveUpRoster);
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// CORE GAME LOGIC
 // ═══════════════════════════════════════════════════════════════
 /* ═══════════════════════════════════════════════════════════
-   NBA MYSTERY PLAYER — Game Logic
+   NBA MYSTERY PLAYER — Core Game Logic
    ═══════════════════════════════════════════════════════════ */
 
 // ── Constants ──────────────────────────────────────────────
@@ -9245,6 +9902,7 @@ function switchMode(mode) {
     document.getElementById('modeDaily')?.classList.remove('mode-tab--active');
     document.getElementById('modeCurrent')?.classList.remove('mode-tab--active');
     document.getElementById('mode2013')?.classList.remove('mode-tab--active');
+    document.getElementById('modeRoster')?.classList.remove('mode-tab--active');
     document.getElementById('modeDuel')?.classList.add('mode-tab--active');
     const newGameBtn = document.getElementById('newGameBtn');
     if (newGameBtn) newGameBtn.style.display = 'none';
@@ -9300,10 +9958,9 @@ function switchMode(mode) {
   document.getElementById('modeCurrent')?.classList.toggle('mode-tab--active', mode === 'current');
   document.getElementById('mode2013')?.classList.toggle('mode-tab--active', mode === '2013');
   document.getElementById('modeDuel')?.classList.remove('mode-tab--active');
+  document.getElementById('modeRoster')?.classList.remove('mode-tab--active');
 
   resetGame();
-  const labels = { daily: '📅 每日挑战', current: '🗽 群雄逐鹿', '2013': '👑 吾皇登基' };
-  console.log(`Switched to ${labels[mode]}`);
 }
 
 // ── State ──────────────────────────────────────────────────
@@ -9365,14 +10022,13 @@ function initGame() {
   renderExistingGuesses();
   updateRemaining();
   bindEvents();
+  bindDuelEvents();
   bindRosterEvents();
 
   if (gameOver) {
     dom.searchInput.disabled = true;
     dom.searchInput.placeholder = 'Game over';
   }
-
-  console.log(`[${currentMode}] Mystery: ${mysteryPlayer.name} (#${mysteryPlayer.id})`);
 
   // Preload silhouette image in background
   preloadSilhouette();
@@ -9755,8 +10411,6 @@ function resetGame() {
   updateRemaining();
   saveState();
   preloadSilhouette();
-
-  console.log(`[${currentMode}] New mystery: ${mysteryPlayer.name} (#${mysteryPlayer.id})`);
 }
 
 function showOverlay(won) {
@@ -9894,591 +10548,6 @@ function escapeHtml(str) {
   div.textContent = str;
   return div.innerHTML;
 }
-
-// ═══════════════════════════════════════════════════════════════
-// PLAYER DUEL MODE — compare per-game stats
-// ═══════════════════════════════════════════════════════════════
-
-const DUEL_TIME = 15;
-const DUEL_LIVES = 3;
-
-const DUEL_QUESTIONS = [
-  { key: 'pts',  label: 'Who scores more?',           format: v => `${v.toFixed(1)} PPG`,   icon: '🏀' },
-  { key: 'reb',  label: 'Who grabs more rebounds?',    format: v => `${v.toFixed(1)} RPG`,   icon: '💪' },
-  { key: 'ast',  label: 'Who dishes more assists?',    format: v => `${v.toFixed(1)} APG`,   icon: '🤝' },
-  { key: 'stl',  label: 'Who gets more steals?',       format: v => `${v.toFixed(1)} SPG`,   icon: '🫳' },
-  { key: 'blk',  label: 'Who blocks more shots?',       format: v => `${v.toFixed(1)} BPG`,   icon: '✋' },
-  { key: 'tov',  label: 'Who turns the ball over MORE?', format: v => `${v.toFixed(1)} TOV`,  icon: '😬' },
-  { key: 'fgPct',  label: 'Who has better FG%?',         format: v => `${(v*100).toFixed(1)}%`, icon: '🎯' },
-  { key: 'fg3Pct', label: 'Who has better 3P%?',        format: v => `${(v*100).toFixed(1)}%`, icon: '🎯' },
-  { key: 'ftPct',  label: 'Who has better FT%?',         format: v => `${(v*100).toFixed(1)}%`, icon: '🎯' },
-  { key: 'ht',   label: 'Who is taller?',              format: v => `${Math.floor(v/12)}-${v%12}`, icon: '📏' },
-  { key: 'age',  label: 'Who is older?',               format: v => `${v} yrs`,  icon: '🎂' },
-];
-
-const duelState = {
-  score: 0,
-  combo: 0,
-  maxCombo: 0,
-  lives: DUEL_LIVES,
-  playerA: null,
-  playerB: null,
-  question: null,
-  playing: false,
-  answered: false,
-  timerInterval: null,
-  barTimers: null,
-  timeLeft: DUEL_TIME,
-};
-
-function getDuelPool() {
-  return PLAYERS_CURRENT.filter(p => p.stats && p.stats.gp > 0 && p.stats.pts > 0);
-}
-
-function pickDuelPair() {
-  const pool = getDuelPool();
-  if (pool.length < 2) return [null, null];
-  const a = pool[Math.floor(Math.random() * pool.length)];
-  let b;
-  do { b = pool[Math.floor(Math.random() * pool.length)]; } while (b.id === a.id);
-  return [a, b];
-}
-
-function pickDuelQuestion(a, b) {
-  const shuffled = [...DUEL_QUESTIONS].sort(() => Math.random() - 0.5);
-  for (const q of shuffled) {
-    const va = getDuelStat(a, q.key);
-    const vb = getDuelStat(b, q.key);
-    if (va !== vb) return q;
-  }
-  return shuffled[0];
-}
-
-function getDuelStat(player, key) {
-  if (key === 'ht') return player.htInches;
-  if (key === 'age') return player.age;
-  return player.stats ? player.stats[key] : 0;
-}
-
-function showDuelUI() {
-  document.body.classList.add('mode--duel');
-  document.getElementById('duelContainer').style.display = '';
-  document.getElementById('searchWrapper').style.display = 'none';
-  document.getElementById('silhouetteWrap').style.display = 'none';
-  document.querySelector('.guess-table').style.display = 'none';
-  document.querySelector('.status-bar').style.display = 'none';
-  document.getElementById('statsPanel').style.display = 'none';
-}
-
-function hideDuelUI() {
-  document.body.classList.remove('mode--duel');
-  document.getElementById('duelContainer').style.display = 'none';
-  document.getElementById('searchWrapper').style.display = '';
-  document.getElementById('silhouetteWrap').style.display = '';
-  document.querySelector('.guess-table').style.display = '';
-  document.querySelector('.status-bar').style.display = '';
-  document.getElementById('statsPanel').style.display = '';
-}
-
-function startDuel() {
-  const [a, b] = pickDuelPair();
-  if (!a || !b) return;
-
-  duelState.playerA = a;
-  duelState.playerB = b;
-  duelState.question = pickDuelQuestion(a, b);
-  duelState.score = 0;
-  duelState.combo = 0;
-  duelState.maxCombo = 0;
-  duelState.lives = DUEL_LIVES;
-  duelState.playing = true;
-  duelState.answered = false;
-
-  document.getElementById('duelStartBtn').style.display = 'none';
-  document.getElementById('duelResult').style.display = 'none';
-  document.getElementById('duelCards').style.display = '';
-  document.getElementById('duelQuestion').style.display = '';
-  document.getElementById('duelTimerWrap').style.display = '';
-  document.getElementById('duelCardA').classList.remove('duel__card--correct', 'duel__card--wrong', 'duel__card--picked');
-  document.getElementById('duelCardB').classList.remove('duel__card--correct', 'duel__card--wrong', 'duel__card--picked');
-  document.getElementById('duelStatA').style.display = 'none';
-  document.getElementById('duelStatB').style.display = 'none';
-
-  updateDuelUI();
-  startDuelTimer();
-}
-
-function updateDuelUI() {
-  const a = duelState.playerA;
-  const b = duelState.playerB;
-  if (!a || !b) return;
-
-  document.getElementById('duelQuestion').textContent =
-    `${duelState.question.icon} ${duelState.question.label}`;
-  document.getElementById('duelScore').textContent = duelState.score;
-  document.getElementById('duelCombo').textContent = duelState.combo;
-  document.getElementById('duelLives').textContent =
-    '❤️'.repeat(duelState.lives) + '🖤'.repeat(DUEL_LIVES - duelState.lives);
-
-  // Card A
-  document.getElementById('duelImgA').src = a.nbaId
-    ? `https://cdn.nba.com/headshots/nba/latest/260x190/${a.nbaId}.png`
-    : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
-  document.getElementById('duelNameA').textContent = a.name;
-  document.getElementById('duelTeamA').textContent = `${a.team} | ${a.pos.join('-')}`;
-
-  // Card B
-  document.getElementById('duelImgB').src = b.nbaId
-    ? `https://cdn.nba.com/headshots/nba/latest/260x190/${b.nbaId}.png`
-    : 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
-  document.getElementById('duelNameB').textContent = b.name;
-  document.getElementById('duelTeamB').textContent = `${b.team} | ${b.pos.join('-')}`;
-}
-
-function startDuelTimer() {
-  duelState.timeLeft = DUEL_TIME;
-  duelState.answered = false;
-  const bar = document.getElementById('duelTimerBar');
-  bar.style.transition = 'none';
-  bar.style.width = '100%';
-  bar.classList.remove('duel__timer-bar--warning', 'duel__timer-bar--danger');
-
-  // Force reflow
-  bar.offsetHeight;
-
-  bar.style.transition = `width ${DUEL_TIME}s linear`;
-  bar.style.width = '0%';
-
-  // Color changes at 5s and 3s
-  if (duelState.barTimers) duelState.barTimers.forEach(clearTimeout);
-  duelState.barTimers = [
-    setTimeout(() => bar.classList.add('duel__timer-bar--warning'), (DUEL_TIME - 5) * 1000),
-    setTimeout(() => bar.classList.add('duel__timer-bar--danger'), (DUEL_TIME - 3) * 1000),
-  ];
-
-  if (duelState.timerInterval) clearInterval(duelState.timerInterval);
-  duelState.timerInterval = setInterval(() => {
-    duelState.timeLeft--;
-    if (duelState.timeLeft <= 0) {
-      clearInterval(duelState.timerInterval);
-      if (!duelState.answered) handleDuelTimeout();
-    }
-  }, 1000);
-}
-
-function handleDuelChoice(pickedSide) {
-  if (!duelState.playing || duelState.answered) return;
-  duelState.answered = true;
-  clearInterval(duelState.timerInterval);
-  if (duelState.barTimers) { duelState.barTimers.forEach(clearTimeout); duelState.barTimers = null; }
-
-  const a = duelState.playerA;
-  const b = duelState.playerB;
-  const q = duelState.question;
-  const valA = getDuelStat(a, q.key);
-  const valB = getDuelStat(b, q.key);
-
-  // Show stats
-  document.getElementById('duelStatA').textContent = q.format(valA);
-  document.getElementById('duelStatA').style.display = '';
-  document.getElementById('duelStatB').textContent = q.format(valB);
-  document.getElementById('duelStatB').style.display = '';
-
-  const correctSide = valA > valB ? 'A' : 'B';
-  const isCorrect = pickedSide === correctSide;
-
-  // Highlight cards
-  if (correctSide === 'A') {
-    document.getElementById('duelCardA').classList.add('duel__card--correct');
-  } else if (pickedSide === 'A') {
-    document.getElementById('duelCardA').classList.add('duel__card--wrong');
-  }
-  if (correctSide === 'B') {
-    document.getElementById('duelCardB').classList.add('duel__card--correct');
-  } else if (pickedSide === 'B') {
-    document.getElementById('duelCardB').classList.add('duel__card--wrong');
-  }
-
-  if (pickedSide === 'A') document.getElementById('duelCardA').classList.add('duel__card--picked');
-  if (pickedSide === 'B') document.getElementById('duelCardB').classList.add('duel__card--picked');
-
-  if (isCorrect) {
-    duelState.score++;
-    duelState.combo++;
-    if (duelState.combo > duelState.maxCombo) duelState.maxCombo = duelState.combo;
-    document.getElementById('duelResultText').textContent = '✅ Correct!';
-  } else {
-    duelState.combo = 0;
-    duelState.lives--;
-    document.getElementById('duelResultText').textContent = '❌ Wrong!';
-  }
-
-  updateDuelUI();
-
-  // Next round or game over
-  setTimeout(() => {
-    if (duelState.lives <= 0) {
-      endDuel();
-    } else {
-      nextDuelRound();
-    }
-  }, 1500);
-}
-
-function handleDuelTimeout() {
-  if (!duelState.playing || duelState.answered) return;
-  duelState.answered = true;
-  if (duelState.barTimers) { duelState.barTimers.forEach(clearTimeout); duelState.barTimers = null; }
-
-  const a = duelState.playerA;
-  const b = duelState.playerB;
-  const q = duelState.question;
-  const valA = getDuelStat(a, q.key);
-  const valB = getDuelStat(b, q.key);
-
-  document.getElementById('duelStatA').textContent = q.format(valA);
-  document.getElementById('duelStatA').style.display = '';
-  document.getElementById('duelStatB').textContent = q.format(valB);
-  document.getElementById('duelStatB').style.display = '';
-
-  duelState.combo = 0;
-  duelState.lives--;
-  document.getElementById('duelResultText').textContent = '⏰ Time\'s up!';
-
-  updateDuelUI();
-
-  setTimeout(() => {
-    if (duelState.lives <= 0) {
-      endDuel();
-    } else {
-      nextDuelRound();
-    }
-  }, 1500);
-}
-
-function nextDuelRound() {
-  const [a, b] = pickDuelPair();
-  if (!a || !b) { endDuel(); return; }
-
-  duelState.playerA = a;
-  duelState.playerB = b;
-  duelState.question = pickDuelQuestion(a, b);
-  duelState.answered = false;
-
-  document.getElementById('duelCardA').classList.remove('duel__card--correct', 'duel__card--wrong', 'duel__card--picked');
-  document.getElementById('duelCardB').classList.remove('duel__card--correct', 'duel__card--wrong', 'duel__card--picked');
-  document.getElementById('duelStatA').style.display = 'none';
-  document.getElementById('duelStatB').style.display = 'none';
-  document.getElementById('duelResultText').textContent = '';
-
-  updateDuelUI();
-  startDuelTimer();
-}
-
-function endDuel() {
-  duelState.playing = false;
-  clearInterval(duelState.timerInterval);
-  if (duelState.barTimers) { duelState.barTimers.forEach(clearTimeout); duelState.barTimers = null; }
-
-  document.getElementById('duelCards').style.display = 'none';
-  document.getElementById('duelQuestion').style.display = 'none';
-  document.getElementById('duelTimerWrap').style.display = 'none';
-  document.getElementById('duelStartBtn').style.display = 'none';
-  document.getElementById('duelResult').style.display = '';
-  document.getElementById('duelFinalScore').textContent = duelState.score;
-  document.getElementById('duelFinalCombo').textContent = duelState.maxCombo;
-
-  // Save best score
-  saveDuelBest();
-}
-
-function saveDuelBest() {
-  try {
-    const key = STORAGE_KEY + '_duelBest';
-    const prev = parseInt(localStorage.getItem(key) || '0', 10);
-    if (duelState.score > prev) {
-      localStorage.setItem(key, String(duelState.score));
-    }
-    document.getElementById('duelBestScore').textContent =
-      `Best: ${Math.max(prev, duelState.score)}`;
-  } catch (e) { /* ignore */ }
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   MAKE DUEL FUNCTIONS GLOBAL (called from onclick in HTML)
-   ═══════════════════════════════════════════════════════════════ */
-window.startDuel = startDuel;
-window.handleDuelChoice = handleDuelChoice;
-
-// ═══════════════════════════════════════════════════════════════
-// ROSTER RUSH — name all players from a team in 2 minutes
-// ═══════════════════════════════════════════════════════════════
-
-const ROSTER_TIME = 120; // 2 minutes
-
-const TEAM_NAMES = {
-  'ATL': 'Atlanta Hawks',      'BOS': 'Boston Celtics',
-  'BKN': 'Brooklyn Nets',      'CHA': 'Charlotte Hornets',
-  'CHI': 'Chicago Bulls',      'CLE': 'Cleveland Cavaliers',
-  'DAL': 'Dallas Mavericks',   'DEN': 'Denver Nuggets',
-  'DET': 'Detroit Pistons',    'GSW': 'Golden State Warriors',
-  'HOU': 'Houston Rockets',    'IND': 'Indiana Pacers',
-  'LAC': 'LA Clippers',        'LAL': 'Los Angeles Lakers',
-  'MEM': 'Memphis Grizzlies',  'MIA': 'Miami Heat',
-  'MIL': 'Milwaukee Bucks',    'MIN': 'Minnesota Timberwolves',
-  'NOP': 'New Orleans Pelicans','NYK': 'New York Knicks',
-  'OKC': 'Oklahoma City Thunder','ORL': 'Orlando Magic',
-  'PHI': 'Philadelphia 76ers', 'PHX': 'Phoenix Suns',
-  'POR': 'Portland Trail Blazers','SAC': 'Sacramento Kings',
-  'SAS': 'San Antonio Spurs',  'TOR': 'Toronto Raptors',
-  'UTA': 'Utah Jazz',          'WAS': 'Washington Wizards',
-};
-
-const rosterState = {
-  team: null,
-  teamPlayers: [],
-  guessed: [],
-  score: 0,
-  playing: false,
-  timerInterval: null,
-  timeLeft: ROSTER_TIME,
-};
-
-function showRosterUI() {
-  document.body.classList.add('mode--roster');
-  document.getElementById('rosterContainer').style.display = '';
-  document.getElementById('searchWrapper').style.display = 'none';
-  document.getElementById('silhouetteWrap').style.display = 'none';
-  document.querySelector('.guess-table').style.display = 'none';
-  document.querySelector('.status-bar').style.display = 'none';
-  document.getElementById('statsPanel').style.display = 'none';
-}
-
-function hideRosterUI() {
-  clearRosterTimer();
-  rosterState.playing = false;
-  document.body.classList.remove('mode--roster');
-  document.getElementById('rosterContainer').style.display = 'none';
-  document.getElementById('searchWrapper').style.display = '';
-  document.getElementById('silhouetteWrap').style.display = '';
-  document.querySelector('.guess-table').style.display = '';
-  document.querySelector('.status-bar').style.display = '';
-  document.getElementById('statsPanel').style.display = '';
-}
-
-function clearRosterTimer() {
-  if (rosterState.timerInterval) {
-    clearInterval(rosterState.timerInterval);
-    rosterState.timerInterval = null;
-  }
-}
-
-function startRoster() {
-  clearRosterTimer();
-
-  // Pick random team with >= 8 players
-  const teams = [...new Set(PLAYERS_CURRENT.map(p => p.team))];
-  const viable = teams.filter(t => {
-    const count = PLAYERS_CURRENT.filter(p => p.team === t).length;
-    return count >= 8;
-  });
-  if (viable.length === 0) return;
-  const team = viable[Math.floor(Math.random() * viable.length)];
-  const teamPlayers = PLAYERS_CURRENT.filter(p => p.team === team);
-
-  rosterState.team = team;
-  rosterState.teamPlayers = teamPlayers;
-  rosterState.guessed = [];
-  rosterState.score = 0;
-  rosterState.playing = true;
-  rosterState.timeLeft = ROSTER_TIME;
-
-  // Reset UI
-  document.getElementById('rosterStartBtn').style.display = 'none';
-  document.getElementById('rosterResult').style.display = 'none';
-  document.getElementById('rosterSearchWrap').style.display = '';
-  document.getElementById('rosterTeamDisplay').textContent = TEAM_NAMES[team] || team;
-  document.getElementById('rosterScore').textContent = '0';
-  document.getElementById('rosterFound').textContent = '0';
-  document.getElementById('rosterTotal').textContent = teamPlayers.length;
-  document.getElementById('rosterList').innerHTML = '';
-  document.getElementById('rosterSearchInput').value = '';
-  document.getElementById('rosterTimer').classList.remove('roster__timer--warning', 'roster__timer--danger');
-
-  updateRosterTimerDisplay();
-  startRosterTimer();
-
-  // Focus search
-  setTimeout(() => document.getElementById('rosterSearchInput').focus(), 100);
-}
-
-function updateRosterTimerDisplay() {
-  const mins = Math.floor(rosterState.timeLeft / 60);
-  const secs = rosterState.timeLeft % 60;
-  const el = document.getElementById('rosterTimer');
-  el.textContent = `${mins}:${String(secs).padStart(2, '0')}`;
-
-  if (rosterState.timeLeft <= 30) el.classList.add('roster__timer--warning');
-  if (rosterState.timeLeft <= 10) {
-    el.classList.remove('roster__timer--warning');
-    el.classList.add('roster__timer--danger');
-  }
-}
-
-function startRosterTimer() {
-  clearRosterTimer();
-  rosterState.timerInterval = setInterval(() => {
-    rosterState.timeLeft--;
-    updateRosterTimerDisplay();
-    if (rosterState.timeLeft <= 0) {
-      clearRosterTimer();
-      endRoster();
-    }
-  }, 1000);
-}
-
-function onRosterSearchInput() {
-  const query = document.getElementById('rosterSearchInput').value.trim().toLowerCase();
-  const dropdown = document.getElementById('rosterDropdown');
-  if (!dropdown) return;
-
-  if (!query || !rosterState.playing) {
-    dropdown.classList.remove('roster__dropdown--open');
-    return;
-  }
-
-  // Search ALL players (not just the target team), exclude already correctly guessed
-  const guessedIds = new Set(rosterState.guessed.map(g => g.id));
-  const results = PLAYERS_CURRENT
-    .filter(p => !guessedIds.has(p.id))
-    .filter(p => normalizeStr(p.name).includes(normalizeStr(query)))
-    .slice(0, 8);
-
-  dropdown.innerHTML = '';
-  if (results.length === 0) {
-    dropdown.innerHTML = '<div class="roster__no-results">No matching players</div>';
-  } else {
-    results.forEach(p => {
-      const div = document.createElement('div');
-      div.className = 'roster__dropdown-item';
-      div.innerHTML = `<span>${escapeHtml(p.name)}</span><span class="search__item-team">${p.pos.join('-')}</span>`;
-      div.addEventListener('mousedown', (e) => {
-        e.preventDefault();
-        submitRosterGuess(p);
-      });
-      dropdown.appendChild(div);
-    });
-  }
-  dropdown.classList.add('roster__dropdown--open');
-}
-
-function onRosterKeydown(e) {
-  if (e.key === 'Enter') {
-    e.preventDefault();
-    const query = document.getElementById('rosterSearchInput').value.trim().toLowerCase();
-    if (!query) return;
-    const guessedIds = new Set(rosterState.guessed.map(g => g.id));
-    const matches = PLAYERS_CURRENT
-      .filter(p => !guessedIds.has(p.id))
-      .filter(p => normalizeStr(p.name).includes(normalizeStr(query)));
-    if (matches.length === 1) {
-      submitRosterGuess(matches[0]);
-    }
-  } else if (e.key === 'Escape') {
-    const dropdown = document.getElementById('rosterDropdown');
-    if (dropdown) dropdown.classList.remove('roster__dropdown--open');
-    document.getElementById('rosterSearchInput').blur();
-  }
-}
-
-function submitRosterGuess(player) {
-  if (!rosterState.playing) return;
-
-  const isCorrect = player.team === rosterState.team;
-  const input = document.getElementById('rosterSearchInput');
-  const dropdown = document.getElementById('rosterDropdown');
-
-  if (isCorrect) {
-    rosterState.guessed.push(player);
-    rosterState.score++;
-
-    // Update display
-    document.getElementById('rosterScore').textContent = rosterState.score;
-    document.getElementById('rosterFound').textContent = rosterState.guessed.length;
-    input.value = '';
-    dropdown.classList.remove('roster__dropdown--open');
-
-    // Add green tag to list
-    const tag = document.createElement('span');
-    tag.className = 'roster__player-tag';
-    tag.textContent = player.name;
-    document.getElementById('rosterList').appendChild(tag);
-
-    // Check if all players found — early win
-    if (rosterState.guessed.length >= rosterState.teamPlayers.length) {
-      clearRosterTimer();
-      setTimeout(() => endRoster(), 400);
-    }
-
-    input.focus();
-  } else {
-    // Wrong team — shake input + show toast
-    input.classList.add('roster__search-input--wrong');
-    input.value = '';
-    dropdown.classList.remove('roster__dropdown--open');
-    showToast(`❌ ${player.name} is not on the ${TEAM_NAMES[rosterState.team] || rosterState.team}`);
-    setTimeout(() => input.classList.remove('roster__search-input--wrong'), 500);
-    input.focus();
-  }
-}
-
-function endRoster() {
-  rosterState.playing = false;
-  clearRosterTimer();
-
-  document.getElementById('rosterSearchWrap').style.display = 'none';
-  document.getElementById('rosterResult').style.display = '';
-
-  const total = rosterState.teamPlayers.length;
-  const pct = total > 0 ? Math.round(rosterState.score / total * 100) : 0;
-
-  let emoji = '🏆';
-  if (pct < 75) emoji = '⭐';
-  if (pct < 50) emoji = '💪';
-  if (pct < 25) emoji = '📋';
-
-  const teamName = TEAM_NAMES[rosterState.team] || rosterState.team;
-  document.getElementById('rosterResultText').innerHTML =
-    `${emoji} ${teamName}<br>You named <strong>${rosterState.score}</strong> of <strong>${total}</strong> players (${pct}%)`;
-
-  saveRosterBest();
-}
-
-function saveRosterBest() {
-  try {
-    const key = STORAGE_KEY + '_rosterBest';
-    const prev = parseInt(localStorage.getItem(key) || '0', 10);
-    if (rosterState.score > prev) {
-      localStorage.setItem(key, String(rosterState.score));
-    }
-    document.getElementById('rosterBest').textContent =
-      `Best: ${Math.max(prev, rosterState.score)}`;
-  } catch (e) { /* ignore */ }
-}
-
-// Bind roster search events on init
-function bindRosterEvents() {
-  const input = document.getElementById('rosterSearchInput');
-  if (input) {
-    input.addEventListener('input', onRosterSearchInput);
-    input.addEventListener('keydown', onRosterKeydown);
-  }
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   MAKE ROSTER FUNCTIONS GLOBAL (called from onclick in HTML)
-   ═══════════════════════════════════════════════════════════════ */
-window.startRoster = startRoster;
 
 // ── Bootstrap ──────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', initGame);

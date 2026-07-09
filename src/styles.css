@@ -1091,6 +1091,28 @@ body.mode--duel .header__new-game {
   transform: scale(0.96);
 }
 
+.roster__giveup-btn {
+  display: block;
+  margin: 8px auto 4px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.3);
+  color: rgba(255,255,255,0.8);
+  padding: 8px 24px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-family: var(--font);
+  font-weight: 600;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.03em;
+}
+
+.roster__giveup-btn:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.5);
+  color: #fff;
+}
+
 .roster__result {
   text-align: center;
   color: var(--text);

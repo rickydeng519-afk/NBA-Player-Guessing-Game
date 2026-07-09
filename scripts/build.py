@@ -1,17 +1,25 @@
 #!/usr/bin/env python3
-"""Build index.html by combining HTML structure, CSS, JS, and player data."""
+"""Build index.html by combining HTML structure, CSS, JS modules, and player data."""
 import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
 
-# Read components
+# Read CSS
 with open(os.path.join(PROJECT_DIR, 'src', 'styles.css'), 'r') as f:
     styles = f.read()
+
+# Read JS modules (order matters: duel/roster define functions game.js calls)
+with open(os.path.join(PROJECT_DIR, 'src', 'duel.js'), 'r') as f:
+    duel_js = f.read()
+
+with open(os.path.join(PROJECT_DIR, 'src', 'roster.js'), 'r') as f:
+    roster_js = f.read()
 
 with open(os.path.join(PROJECT_DIR, 'src', 'game.js'), 'r') as f:
     game_js = f.read()
 
+# Read player data
 with open(os.path.join(PROJECT_DIR, 'data', 'players.js'), 'r') as f:
     players_data = f.read()
 
@@ -115,7 +123,7 @@ html = f'''<!DOCTYPE html>
     </div>
 
     <div class="duel__cards" id="duelCards" style="display:none">
-      <div class="duel__card" id="duelCardA" onclick="handleDuelChoice('A')">
+      <div class="duel__card" id="duelCardA">
         <img class="duel__card-img" id="duelImgA"
              src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="">
         <div class="duel__card-name" id="duelNameA"></div>
@@ -123,7 +131,7 @@ html = f'''<!DOCTYPE html>
         <div class="duel__card-stat" id="duelStatA" style="display:none"></div>
       </div>
       <div class="duel__vs">VS</div>
-      <div class="duel__card" id="duelCardB" onclick="handleDuelChoice('B')">
+      <div class="duel__card" id="duelCardB">
         <img class="duel__card-img" id="duelImgB"
              src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="">
         <div class="duel__card-name" id="duelNameB"></div>
@@ -132,7 +140,7 @@ html = f'''<!DOCTYPE html>
       </div>
     </div>
 
-    <button id="duelStartBtn" class="duel__start-btn" onclick="startDuel()">⚡ Start Duel</button>
+    <button id="duelStartBtn" class="duel__start-btn">⚡ Start Duel</button>
 
     <div id="duelResult" class="duel__result" style="display:none">
       <div id="duelResultText" class="duel__result-text"></div>
@@ -140,7 +148,7 @@ html = f'''<!DOCTYPE html>
         <div>Score: <span id="duelFinalScore">0</span></div>
         <div>Best Combo: <span id="duelFinalCombo">0</span></div>
       </div>
-      <button class="duel__start-btn" onclick="startDuel()">🔄 Play Again</button>
+      <button class="duel__start-btn" id="duelPlayAgainBtn">🔄 Play Again</button>
     </div>
   </div>
 
@@ -164,11 +172,12 @@ html = f'''<!DOCTYPE html>
 
     <div class="roster__list" id="rosterList"></div>
 
-    <button id="rosterStartBtn" class="roster__start-btn" onclick="startRoster()">🧩 Start Roster Rush</button>
+    <button id="rosterGiveUpBtn" class="roster__giveup-btn" style="display:none">🏳️ Give Up · Record Score</button>
+    <button id="rosterStartBtn" class="roster__start-btn">🧩 Start Roster Rush</button>
 
     <div id="rosterResult" class="roster__result" style="display:none">
       <div class="roster__result-text" id="rosterResultText"></div>
-      <button class="roster__start-btn" onclick="startRoster()">🔄 Play Again</button>
+      <button class="roster__start-btn" id="rosterPlayAgainBtn">🔄 Play Again</button>
     </div>
   </div>
 </div>
@@ -201,7 +210,17 @@ html = f'''<!DOCTYPE html>
 {players_2013}
 
 // ═══════════════════════════════════════════════════════════════
-// GAME LOGIC
+// PLAYER DUEL MODULE
+// ═══════════════════════════════════════════════════════════════
+{duel_js}
+
+// ═══════════════════════════════════════════════════════════════
+// ROSTER RUSH MODULE
+// ═══════════════════════════════════════════════════════════════
+{roster_js}
+
+// ═══════════════════════════════════════════════════════════════
+// CORE GAME LOGIC
 // ═══════════════════════════════════════════════════════════════
 {game_js}
 </script>
